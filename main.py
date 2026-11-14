@@ -21,7 +21,7 @@ from telebot import types
 import json
 import os
 
-TOKEN = ""
+TOKEN = os.environ.get("BOT_TOKEN", "")
 bot = telebot.TeleBot(TOKEN)
 
 FILE = "users.json"
