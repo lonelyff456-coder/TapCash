@@ -38,14 +38,14 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
   <div class="top"><div style="font-weight:800">TAPCASH ARENA</div><div class="balance" id="balTop">0 TAP</div><div class="usd" id="usdTop">$0.00</div><div class="sub" id="todayTop">+0 TAP today</div></div>
   <div class="coin" onclick="doTap()">TAP</div>
   <div style="text-align:center" id="tapLeft">500 taps left today</div>
-  <div class="box"><b>🎁 Daily Check-in</b><p class="small">Day 1 = 10 TAP, Day 2 = 20 TAP... Day 7 = 70 TAP. Miss 1 day, e reset.</p><button class="btn" onclick="checkin()">Claim Check-in</button></div>
+  <div class="box"><b>🎁 Daily Check-in</b><p class="small">Day 1 = 10 TAP, Day 2 = 20 TAP... Day 7 = 70 TAP. Miss 1 day, e reset.</p><button class="btn" id="checkinBtn" onclick="checkin()">Claim Check-in</button></div>
   <div class="box"><b>🏆 Top Earners</b><p class="small">Top 10 for week go share $10. No 1 = $3, No 2 = $2.</p></div>
 </div>
 <div id="earnPage" class="hidden">
   <div class="top"><div style="font-weight:800">EARN CENTER - Complete Tasks</div><div class="balance" id="balEarn">0 TAP</div><div class="sub" id="todayEarn">+0 TAP today</div></div>
   <div class="tabs"><span class="tab">All</span><span class="tab">Main</span><span class="tab">Watch</span><span class="tab active">Ads 3</span><span class="tab">Social</span><span class="tab">Featured</span></div>
   <div id="adCards"></div>
-  <div class="box"><b>🎡 Free Spin</b><p class="small" id="spinInfo">1st Spin FREE. Next spins = Watch 1 Ad to Spin.</p><button class="btn" id="checkinBtn" onclick="checkin()">Claim Check-in</button><p class="small" id="spinResult"></p></div>
+  <div class="box"><b>🎡 Free Spin</b><p class="small" id="spinInfo">1st Spin FREE. Next spins = Watch 1 Ad to Spin.</p><button class="btn" onclick="doSpin()">SPIN NOW</button><p class="small" id="spinResult"></p></div>
 </div>
 <div id="arenaPage" class="hidden">
   <div class="top"><h2>ARENA</h2><p class="small">12 plays per day. After 12, watch 1 ad for +2 plays.</p></div>
@@ -86,6 +86,11 @@ function render(){
   document.querySelectorAll('#usdTop,#usdWallet').forEach(e=>e.textContent='$'+(bal*0.001).toFixed(3));
   document.querySelectorAll('#todayTop,#todayEarn').forEach(e=>e.textContent='+'+todayEarn.toFixed(2)+' TAP today');
   document.getElementById('tapLeft').textContent=tapsLeft+' taps left today';
+  let lastCheckin2 = localStorage.getItem('last_checkin')||'';
+  if(lastCheckin2===new Date().toDateString()){
+    let b=document.getElementById('checkinBtn');
+    if(b){ b.textContent='✅ Claimed Today - Come Back Tomorrow'; b.disabled=true; b.style.background='#333'; }
+  }
   let html='';
   [['Monetag','🔵'],['Adsgram','✈️'],['Gigapub','🟢']].forEach(([name,icon])=>{
     let c=adCounts[name]||0;
@@ -119,7 +124,15 @@ function doSpin(){
   add(win);
   document.getElementById('spinResult').textContent='🎉 You win +'+win+' TAP!';
 }
-function checkin(){ add(10); alert('Daily Check-in +10 TAP'); }
+function checkin(){
+  let lastCheckin = localStorage.getItem('last_checkin')||'';
+  let todayStr = new Date().toDateString();
+  if(lastCheckin===todayStr){ alert('You don claim check-in today already. Come back tomorrow!'); return; }
+  localStorage.setItem('last_checkin', todayStr);
+  add(10); alert('Daily Check-in +10 TAP');
+  document.getElementById('checkinBtn').textContent='✅ Claimed Today - Come Back Tomorrow';
+  document.getElementById('checkinBtn').disabled=true;
+}
 function dice(){
   let g=prompt('Guess 1 to 6'); if(!g) return;
   let roll=Math.floor(Math.random()*6)+1;
