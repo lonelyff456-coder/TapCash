@@ -70,7 +70,7 @@ def main_menu():
 def start(message):
     user = get_user(message.from_user.id)
     name = message.from_user.first_name
-    bot.send_message(message.chat.id, f"Welcome {name} to TapCash Arena!\n\nBalance: {user['balance']} coins\nTaps: {user['taps']}\n\nPress TAP +10 to earn!", reply_markup=main_menu())
+    bot.send_message(message.chat.id, f"Welcome {name} to TapCash Arena!\n\nBalance: {user['balance']} TAP\nTaps: {user['taps']}\n\nPress TAP +10 to earn!", reply_markup=main_menu())
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_button(call):
@@ -81,13 +81,13 @@ def handle_button(call):
         user['taps'] += 1
         update_user(call.from_user.id, user['balance'], user['taps'])
         try:
-            bot.answer_callback_query(call.id, "+10 coins! 🪙")
+            bot.answer_callback_query(call.id, "+10 TAP!")
         except:
             pass
-        bot.edit_message_text(f"Welcome {name} to TapCash Arena!\n\nBalance: {user['balance']} coins\nTaps: {user['taps']}\n\n+10 coins added!\n\nPress TAP +10 to earn!", call.message.chat.id, call.message.message_id, reply_markup=main_menu())
+        bot.edit_message_text(f"Welcome {name} to TapCash Arena!\n\nBalance: {user['balance']} TAP\nTaps: {user['taps']}\n\n+10 TAP added!\n\nPress TAP +10 to earn!", call.message.chat.id, call.message.message_id, reply_markup=main_menu())
     elif call.data == "balance":
-        bot.answer_callback_query(call.id, f"Balance: {user['balance']} coins")
-        bot.send_message(call.message.chat.id, f"💰 Your Balance: {user['balance']} coins\nTotal Taps: {user['taps']}\n\nKeep tapping!", reply_markup=main_menu())
+        bot.answer_callback_query(call.id, f"Balance: {user['balance']} TAP")
+        bot.send_message(call.message.chat.id, f"💰 Your Balance: {user['balance']} TAP\nTotal Taps: {user['taps']}\n\nKeep tapping!", reply_markup=main_menu())
 
 print("TapCash Arena Bot is running...")
 bot.infinity_polling()
