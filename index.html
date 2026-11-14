@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TapCash Arena</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+body{background:#0f0f1a;color:white;text-align:center;font-family:Arial;padding:20px;margin:0}
+.top{background:#1e1e2e;padding:15px;border-radius:15px;margin-bottom:20px}
+.balance{font-size:32px;color:#FFD700;font-weight:bold}
+.dollar{color:#00ff88}
+.coin{width:200px;height:200px;background:radial-gradient(circle,#FFD700,#FFA500);border-radius:50%;font-size:90px;display:flex;align-items:center;justify-content:center;margin:20px auto;cursor:pointer;border:8px solid #fff3;box-shadow:0 0 30px #FFD700;user-select:none;touch-action:manipulation}
+.coin:active{transform:scale(0.95)}
+.btn{background:#FFD700;color:black;border:none;padding:15px 25px;border-radius:12px;font-weight:bold;font-size:16px;margin:5px;width:90%;cursor:pointer}
+.btn2{background:#222;color:white}
+.small{color:#aaa;font-size:13px}
+.bar{background:#333;height:15px;border-radius:10px;overflow:hidden;margin:10px 0}
+.fill{background:#FFD700;height:100%;width:100%}
+</style>
+</head>
+<body>
+<div class="top">
+<div>💰 YOUR BALANCE</div>
+<div class="balance"><span id="coins">0</span> TAP</div>
+<div class="dollar">$<span id="dollars">0.00</span></div>
+<div class="small">Taps Left Today: <span id="tapsLeft">500</span> / 500</div>
+<div class="bar"><div class="fill" id="barFill"></div></div>
+</div>
+
+<h2>🪙 TAP TAP GAME</h2>
+<p class="small">Tap the coin! 1 Tap = 1 TAP</p>
+
+<div class="coin" id="coinBtn">🪙</div>
+<div id="tapMsg" style="height:20px;color:#00ff88;font-weight:bold"></div>
+<p>Taps Today: <span id="taps">0</span></p>
+
+<button class="btn" onclick="watchAd()">📺 Watch Ad +25 TAP</button>
+<button class="btn btn2" onclick="dailyBonus()">🎁 Daily Bonus +10 TAP</button>
+<button class="btn btn2" onclick="alert('Withdraw go open when you reach 2000 TAP = $2.00')">💵 Withdraw ($2 Min)</button>
+
+<p class="small">TapCash Arena - Play. Tap. Earn Real Dollars.</p>
+
+<script>
+let coins = parseInt(localStorage.getItem('tapcash_coins')||'0');
+let taps = parseInt(localStorage.getItem('tapcash_taps')||'0');
+let lastDay = localStorage.getItem('tapcash_day')||'';
+let today = new Date().toDateString();
+if(lastDay !== today){ taps=0; localStorage.setItem('tapcash_day', today); localStorage.setItem('tapcash_taps','0'); }
+function update(){
+  document.getElementById('coins').innerText = coins;
+  document.getElementById('dollars').innerText = (coins/1000).toFixed(3);
+  document.getElementById('taps').innerText = taps;
+  let left = 500 - taps; if(left<0) left=0;
+  document.getElementById('tapsLeft').innerText = left;
+  document.getElementById('barFill').style.width = (left/500*100)+'%';
+  localStorage.setItem('tapcash_coins', coins);
+  localStorage.setItem('tapcash_taps', taps);
+}
+document.getElementById('coinBtn').addEventListener('click', function(e){
+  if(taps >= 500){ document.getElementById('tapMsg').innerText = 'You don finish taps for today! Watch 1 Ad for +100 taps'; return; }
+  coins += 1; taps += 1;
+  document.getElementById('tapMsg').innerText = '+1 TAP!';
+  update();
+});
+function watchAd(){
+  alert('Ad go play for 15 secs... (We go connect real Adsgram next)');
+  coins += 25; update();
+  alert('+25 TAP added!');
+}
+function dailyBonus(){
+  coins += 10; update();
+  alert('+10 TAP Daily Bonus!');
+}
+if(window.Telegram && Telegram.WebApp){ Telegram.WebApp.ready(); Telegram.WebApp.expand(); }
+update();
+</script>
+</body>
+</html>
