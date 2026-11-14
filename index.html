@@ -26,6 +26,8 @@ body{margin:0;background:#0a0a0a;color:#fff;padding-bottom:80px}
 .coin{width:120px;height:120px;background:radial-gradient(circle,#fde68a,#f59e0b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:900;color:#000;margin:18px auto;cursor:pointer;user-select:none;box-shadow:0 0 30px #f59e0b66}
 .coin:active{transform:scale(.95)}
 .btn{background:#2563eb;color:#fff;border:0;padding:12px;width:100%;border-radius:14px;font-weight:800;margin-top:10px}
+.dice-btn{background:#1e1e1e;color:#fff;border:1px solid #333;padding:12px 0;width:100%;border-radius:12px;font-weight:800;font-size:16px}
+.dice-btn:active{background:#2563eb}
 .box{background:#1a1a1a;margin:12px 14px;padding:16px;border-radius:18px}
 .small{color:#aaa;font-size:13px;line-height:1.5}
 .nav{position:fixed;bottom:0;left:0;right:0;background:#111;display:flex;justify-content:space-around;padding:10px 0 14px;border-top:1px solid #222}
@@ -53,13 +55,24 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
   <div class="box"><b>🎡 Free Spin</b><p class="small" id="spinInfo">1st Spin FREE. Next spins = Watch 1 Ad to Spin.</p><button class="btn" onclick="doSpin()">SPIN NOW</button><p class="small" id="spinResult"></p></div>
 </div>
 <div id="arenaPage" class="hidden">
-  <div class="top"><h2>ARENA</h2><p class="small">12 plays per day. After 12, watch 1 ad for +2 plays.</p></div>
-  <div class="box"><b>🎲 Lucky Dice</b><p class="small">Guess 1-6. Correct = win double.</p><button class="btn" onclick="dice()">Play Dice - 5 TAP Win</button></div>
-  <div class="box"><b>🔍 Word Search • ❌⭕ Tic-Tac-Toe • 🎵 Beat Tap • 🚀 Space Dodger</b><p class="small">Coming in Week 2. Tap game is already live for now.</p></div>
+  <div class="top"><h2>ARENA</h2><p class="small" id="arenaPlaysText">12 plays per day. After 12, watch 1 ad for +2 plays.</p></div>
+  <div class="box"><b>🎲 Lucky Dice</b><p class="small">Pick 1-6. Correct = win +10 TAP!</p>
+  <div style="display:flex;gap:8px;margin-top:12px">
+    <button class="dice-btn" onclick="playDice(1)">1</button>
+    <button class="dice-btn" onclick="playDice(2)">2</button>
+    <button class="dice-btn" onclick="playDice(3)">3</button>
+    <button class="dice-btn" onclick="playDice(4)">4</button>
+    <button class="dice-btn" onclick="playDice(5)">5</button>
+    <button class="dice-btn" onclick="playDice(6)">6</button>
+  </div>
+  <p class="small" id="diceResult"></p>
+  <p class="small" id="arenaHistory"></p></div>
+  <div class="box"><b>❌⭕ Tic-Tac-Toe</b><p class="small">Coming in Week 2. Play Dice for now.</p><button class="btn" onclick="alert('Tic-Tac-Toe dey come for Week 2! Play Dice for now.')">Play Tic-Tac-Toe</button></div>
+  <div class="box"><b>🚀 Space Dodger</b><p class="small">Coming in Week 2. Play Dice for now.</p><button class="btn" onclick="alert('Space Dodger dey come for Week 2! Play Dice for now.')">Play Space Dodger</button></div>
 </div>
 <div id="friendsPage" class="hidden">
   <div class="top"><h2>FRIENDS</h2><p class="small">Invite a friend. When your friend completes the daily task (45 ads), you get 200 TAP bonus.</p><p class="small">Your friend must complete the daily task before your reward is granted.</p></div>
-  <div class="box"><b>Your Link</b><input id="refLink" readonly value="https://t.me/YourBot?start=YOUR_ID"><button class="btn" onclick="copyRef()">Copy Invite Link</button></div>
+  <div class="box"><b>Your Link</b><input id="refLink" readonly value="https://t.me/tapcash_arena_game_bot?start=YOUR_ID"><button class="btn" onclick="copyRef()">Copy Invite Link</button></div>
   <div class="box"><b>Referral Rewards</b><p class="small" id="refInfo">You have earned 0 TAP from referrals. Each friend who completes the daily task = +200 TAP for you.</p></div>
 </div>
 <div id="walletPage" class="hidden">
@@ -75,21 +88,12 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
   <div onclick="show('walletPage',this)">💰<br>Wallet</div>
 </div>
 <script>
-// ===== TapCash Arena - Settings in English =====
 const CONFIG = {
-  adsPerNetwork: 15,
-  totalAdsPerDay: 90,
-  resetHours: 12,
-  tapPerAd: 5,
-  tapForOneDollar: 1350,
-  minWithdrawTap: 1350,
-  minWithdrawUsd: 1.00,
-  withdrawFee: 0.05,
-  dailyTaskAds: 45,
-  referralReward: 200,
-  minAdsForWithdraw: 270
+  adsPerNetwork: 15, totalAdsPerDay: 90, resetHours: 12, tapPerAd: 5,
+  tapForOneDollar: 1350, minWithdrawTap: 1350, minWithdrawUsd: 1.00,
+  withdrawFee: 0.05, dailyTaskAds: 45, referralReward: 200, minAdsForWithdraw: 270,
+  arenaMaxPlays: 12
 };
-
 let bal = parseFloat(localStorage.getItem('tap_bal')||0);
 let tapsLeft = parseInt(localStorage.getItem('tap_left')||500);
 let tapsDate = localStorage.getItem('tap_date')||'';
@@ -104,21 +108,30 @@ let referralEarned = parseFloat(localStorage.getItem('referral_earned')||0);
 let adsDate = localStorage.getItem('ads_date')||'';
 if(adsDate!==today){ adsToday=0; adCounts={"Monetag":0,"Adsgram":0,"Gigapub":0}; localStorage.setItem('ads_date',today); }
 
-// --- ADSGRAM - REAL ADS - BlockID 59790 ---
-const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "59790" }) : null;
+// ===== ARENA MEMORY - E NO GO RESET AGAIN =====
+// We save Arena for phone, so even if you close bot, e go stay where you stop
+let arenaState = JSON.parse(localStorage.getItem('arena_state') || '{"plays":0,"date":"","lastPick":0,"lastRoll":0,"lastResult":"","history":[]}');
+if(arenaState.date !== today){ arenaState.plays = 0; arenaState.date = today; arenaState.history = []; saveArena(); }
+function saveArena(){ localStorage.setItem('arena_state', JSON.stringify(arenaState)); }
+function restoreArena(){
+  // Bring back last Dice result when you open Arena again
+  if(arenaState.lastResult){
+    let el = document.getElementById('diceResult');
+    if(el) el.textContent = arenaState.lastResult;
+  }
+  if(arenaState.history && arenaState.history.length>0){
+    let h = document.getElementById('arenaHistory');
+    if(h) h.textContent = 'Last plays: ' + arenaState.history.slice(-3).join(' | ');
+  }
+  let p = document.getElementById('arenaPlaysText');
+  if(p) p.textContent = 'Plays used today: ' + arenaState.plays + ' / ' + CONFIG.arenaMaxPlays + '. Plays left: ' + (CONFIG.arenaMaxPlays - arenaState.plays);
+}
 
+const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "59790" }) : null;
 function save(){ localStorage.setItem('tap_bal',bal); localStorage.setItem('tap_left',tapsLeft); localStorage.setItem('ads_today',adsToday); localStorage.setItem('ads_total',adsTotal); localStorage.setItem('ad_counts',JSON.stringify(adCounts)); localStorage.setItem('spins',spins); localStorage.setItem('earn_today',todayEarn); localStorage.setItem('referral_earned',referralEarned); render(); }
 function add(n){ bal+=n; todayEarn+=n; save(); }
 function usdValue(tap){ return tap / CONFIG.tapForOneDollar; }
 function isDailyTaskCompleted(){ return adsToday >= CONFIG.dailyTaskAds; }
-function giveReferralReward(referredUserAdsToday){
-  if(referredUserAdsToday >= CONFIG.dailyTaskAds){
-    referralEarned += CONFIG.referralReward;
-    add(CONFIG.referralReward);
-    return true;
-  }
-  return false;
-}
 function render(){
   document.querySelectorAll('#balTop,#balEarn,#balWallet').forEach(e=>e.textContent=bal.toFixed(2)+' TAP');
   document.querySelectorAll('#usdTop,#usdWallet').forEach(e=>e.textContent='$'+usdValue(bal).toFixed(3));
@@ -145,42 +158,79 @@ function render(){
   html+=`<div style="padding:0 14px" class="small">Ads watched today: ${adsToday}/${CONFIG.totalAdsPerDay} paid (90 per day). Total ads watched: ${adsTotal}. Daily Task: ${adsToday}/${CONFIG.dailyTaskAds} ads. You need ${CONFIG.minAdsForWithdraw} total ads before your first withdrawal.</div>`;
   document.getElementById('adCards').innerHTML=html;
   document.getElementById('spinInfo').textContent = spins==0 ? '1st Spin FREE - tap SPIN NOW' : 'Next spins = Watch 1 Ad to Spin. Spins used: '+spins;
+  restoreArena();
 }
-function show(id,el){ ['homePage','earnPage','arenaPage','friendsPage','walletPage'].forEach(p=>document.getElementById(p).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); document.querySelectorAll('.nav div').forEach(d=>d.classList.remove('active')); el.classList.add('active'); window.scrollTo(0,0); }
+function show(id,el){
+  ['homePage','earnPage','arenaPage','friendsPage','walletPage'].forEach(p=>document.getElementById(p).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.nav div').forEach(d=>d.classList.remove('active')); el.classList.add('active'); window.scrollTo(0,0);
+  if(id==='arenaPage') restoreArena();
+}
 function doTap(){
   if(tapsLeft<=0){ alert('You have finished your taps for today. Watch 1 Ad to get +100 extra taps.'); return; }
   tapsLeft--; add(0.1);
 }
 function watchAd(name){
-  // ===== MONETAG - REAL ADS - Zone 12265858 =====
   if(name==='Monetag'){
     if(typeof show_12265858 !== 'function'){ alert('Monetag not loaded yet. Check internet and try again.'); return; }
-    show_12265858().then(()=>{
-      adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++;
-      add(CONFIG.tapPerAd);
-      alert('You earned +'+CONFIG.tapPerAd+' TAP from Monetag');
-    }).catch(()=>{
-      alert('Watch the full ad to get +'+CONFIG.tapPerAd+' TAP');
-    });
+    show_12265858().then(()=>{ adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++; add(CONFIG.tapPerAd); alert('You earned +'+CONFIG.tapPerAd+' TAP from Monetag'); }).catch(()=>{ alert('Watch the full ad to get +'+CONFIG.tapPerAd+' TAP'); });
     return;
   }
-  // REAL ADSGRAM AD
   if(name==='Adsgram'){
     if(!AdController){ alert('Adsgram not loaded. Check internet and try again.'); return; }
-    AdController.show().then((result)=>{
-      adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++;
-      add(CONFIG.tapPerAd);
-      alert('You earned +'+CONFIG.tapPerAd+' TAP from Adsgram');
-    }).catch((result)=>{
-      alert('Watch the full ad to get +'+CONFIG.tapPerAd+' TAP');
-    });
+    AdController.show().then(()=>{ adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++; add(CONFIG.tapPerAd); alert('You earned +'+CONFIG.tapPerAd+' TAP from Adsgram'); }).catch(()=>{ alert('Watch the full ad to get +'+CONFIG.tapPerAd+' TAP'); });
     return;
   }
-  // Gigapub - still simulated for now
-  if(!confirm('Simulated '+name+' ad (15s). In the real app, a real ad will show here. Press OK to earn +'+CONFIG.tapPerAd+' TAP.')) return;
-  adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++;
-  add(CONFIG.tapPerAd);
-  alert('You earned +'+CONFIG.tapPerAd+' TAP from '+name);
+  adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++; add(CONFIG.tapPerAd); alert('You earned +'+CONFIG.tapPerAd+' TAP from '+name);
 }
 function doSpin(){
-  if(spins>0
+  if(spins>0){ adsToday++; adsTotal++; }
+  spins++;
+  let r=Math.random()*100, win=5;
+  if(r<70) win=5; else if(r<90) win=10; else if(r<99) win=15; else win=50;
+  add(win);
+  document.getElementById('spinResult').textContent='🎉 You won +'+win+' TAP!';
+}
+function checkin(){
+  let lastCheckin = localStorage.getItem('last_checkin')||'';
+  let todayStr = new Date().toDateString();
+  if(lastCheckin===todayStr){ alert('You have already claimed your check-in today. Please come back tomorrow!'); return; }
+  localStorage.setItem('last_checkin', todayStr);
+  add(10); alert('Daily Check-in +10 TAP');
+  document.getElementById('checkinBtn').textContent='✅ Claimed Today - Come Back Tomorrow';
+  document.getElementById('checkinBtn').disabled=true;
+}
+// ===== FIXED DICE WITH MEMORY =====
+function playDice(g){
+  if(arenaState.plays >= CONFIG.arenaMaxPlays){ alert('You don use your 12 plays for today. Come back tomorrow!'); return; }
+  let roll=Math.floor(Math.random()*6)+1;
+  arenaState.plays++;
+  arenaState.lastPick = g;
+  arenaState.lastRoll = roll;
+  if(g==roll){
+    add(10);
+    arenaState.lastResult = '🎉 You won! You pick '+g+', roll na '+roll+' +10 TAP';
+    arenaState.history.push('Pick '+g+' Roll '+roll+' WIN');
+  } else {
+    arenaState.lastResult = '😅 You pick '+g+', roll na '+roll+'. Try again!';
+    arenaState.history.push('Pick '+g+' Roll '+roll+' LOSE');
+  }
+  saveArena();
+  document.getElementById('diceResult').textContent = arenaState.lastResult;
+  restoreArena();
+}
+function dice(){ playDice(1); }
+function copyRef(){ navigator.clipboard.writeText(document.getElementById('refLink').value); alert('Link copied!'); }
+function withdraw(){
+  if(bal<CONFIG.minWithdrawTap){ alert('You need '+CONFIG.minWithdrawTap+' TAP ($'+CONFIG.minWithdrawUsd.toFixed(2)+') to withdraw. You have '+bal.toFixed(0)); return; }
+  if(adsTotal<CONFIG.minAdsForWithdraw){ alert('You must watch at least '+CONFIG.minAdsForWithdraw+' ads total before your first withdrawal. You have watched '+adsTotal); return; }
+  if(!document.getElementById('walletAddr').value){ alert('Please enter your USDT wallet address'); return; }
+  bal-=CONFIG.minWithdrawTap; save();
+  document.getElementById('wdMsg').textContent='✅ Withdrawal request sent! $0.95 will arrive within 24 hours. We will post it in Payout Proofs.';
+}
+render();
+restoreArena();
+if(window.Telegram?.WebApp) Telegram.WebApp.ready();
+</script>
+</body>
+    </html>
