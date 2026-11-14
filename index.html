@@ -32,6 +32,8 @@ body{margin:0;background:#0a0a0a;color:#fff;padding-bottom:80px}
 .nav div.active{color:#2563eb}
 .hidden{display:none}
 input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;background:#111;color:#fff;margin-top:8px}
+.progress{background:#333;height:8px;border-radius:10px;margin-top:8px;overflow:hidden}
+.progress div{background:#22c55e;height:100%;width:0%}
 </style>
 </head>
 <body>
@@ -40,6 +42,7 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
   <div class="coin" onclick="doTap()">TAP</div>
   <div style="text-align:center" id="tapLeft">500 taps left today</div>
   <div class="box"><b>🎁 Daily Check-in</b><p class="small">Day 1 = 10 TAP, Day 2 = 20 TAP... Day 7 = 70 TAP. Miss 1 day and it resets.</p><button class="btn" id="checkinBtn" onclick="checkin()">Claim Check-in</button></div>
+  <div class="box"><b>✅ Daily Task</b><p class="small" id="dailyTaskText">Watch 45 ads today to complete your daily task. Complete it to unlock referral rewards for your friends.</p><div class="progress"><div id="dailyTaskBar"></div></div><p class="small" id="dailyTaskCount">0 / 45 ads</p></div>
   <div class="box"><b>🏆 Top Earners</b><p class="small">Top 10 for the week will share $10. No. 1 = $3, No. 2 = $2.</p></div>
 </div>
 <div id="earnPage" class="hidden">
@@ -54,13 +57,14 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
   <div class="box"><b>🔍 Word Search • ❌⭕ Tic-Tac-Toe • 🎵 Beat Tap • 🚀 Space Dodger</b><p class="small">Coming in Week 2. Tap game is already live for now.</p></div>
 </div>
 <div id="friendsPage" class="hidden">
-  <div class="top"><h2>FRIENDS</h2><p class="small">Invite a friend. When they reach $0.50, you get $0.10 = 100 TAP bonus.</p></div>
+  <div class="top"><h2>FRIENDS</h2><p class="small">Invite a friend. When your friend completes the daily task (45 ads), you get 200 TAP bonus.</p><p class="small">Your friend must complete the daily task before your reward is granted.</p></div>
   <div class="box"><b>Your Link</b><input id="refLink" readonly value="https://t.me/YourBot?start=YOUR_ID"><button class="btn" onclick="copyRef()">Copy Invite Link</button></div>
+  <div class="box"><b>Referral Rewards</b><p class="small" id="refInfo">You have earned 0 TAP from referrals. Each friend who completes the daily task = +200 TAP for you.</p></div>
 </div>
 <div id="walletPage" class="hidden">
   <div class="top"><h2>WALLET</h2><div class="balance" id="balWallet">0 TAP</div><div class="usd" id="usdWallet">$0.00</div></div>
-  <div class="box"><b>Withdraw - Min $2.00 (2,000 TAP)</b><p class="small">Fee: $0.10. You will receive $1.90. Within 24 hours. You must watch at least 10 ads total before your first withdrawal.</p><input id="walletAddr" placeholder="Your USDT (TRC20) wallet address"><button class="btn" onclick="withdraw()">Request Withdraw</button><p class="small" id="wdMsg"></p></div>
-  <div class="box"><b>📜 Payout Proofs</b><p class="small">po*** - $2.00 - 13 Nov 2026<br>jo*** - $2.00 - 13 Nov 2026</p></div>
+  <div class="box"><b>Withdraw - Min $1.00 (1,350 TAP)</b><p class="small">Fee: $0.05. You will receive $0.95. Within 24 hours. You must watch at least 270 ads total before your first withdrawal (3 days x 90 ads).</p><input id="walletAddr" placeholder="Your USDT (TRC20) wallet address"><button class="btn" onclick="withdraw()">Request Withdraw</button><p class="small" id="wdMsg"></p></div>
+  <div class="box"><b>📜 Payout Proofs</b><p class="small">po*** - $1.00 - 14 Nov 2026<br>jo*** - $1.00 - 14 Nov 2026</p></div>
 </div>
 <div class="nav">
   <div onclick="show('homePage',this)" class="active">🏠<br>Home</div>
@@ -70,6 +74,21 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
   <div onclick="show('walletPage',this)">💰<br>Wallet</div>
 </div>
 <script>
+// ===== TapCash Arena - Settings in English =====
+const CONFIG = {
+  adsPerNetwork: 15, // 15 ads per network per 12 hours
+  totalAdsPerDay: 90, // 15 x 3 networks x 2 = 90 ads per day
+  resetHours: 12, // Ads reset 12 hours after the first ad
+  tapPerAd: 5, // User earns 5 TAP per ad
+  tapForOneDollar: 1350, // 1350 TAP = $1.00
+  minWithdrawTap: 1350, // Minimum withdraw
+  minWithdrawUsd: 1.00,
+  withdrawFee: 0.05, // Fee
+  dailyTaskAds: 45, // Daily task = 45 ads
+  referralReward: 200, // Referrer gets 200 TAP after friend completes daily task
+  minAdsForWithdraw: 270 // 3 days x 90 ads
+};
+
 let bal = parseFloat(localStorage.getItem('tap_bal')||0);
 let tapsLeft = parseInt(localStorage.getItem('tap_left')||500);
 let tapsDate = localStorage.getItem('tap_date')||'';
@@ -80,17 +99,40 @@ let adsTotal = parseInt(localStorage.getItem('ads_total')||0);
 let adCounts = JSON.parse(localStorage.getItem('ad_counts')||'{"Monetag":0,"Adsgram":0,"Gigapub":0}');
 let spins = parseInt(localStorage.getItem('spins')||0);
 let todayEarn = parseFloat(localStorage.getItem('earn_today')||0);
+let referralEarned = parseFloat(localStorage.getItem('referral_earned')||0);
+let adsDate = localStorage.getItem('ads_date')||'';
+if(adsDate!==today){ adsToday=0; adCounts={"Monetag":0,"Adsgram":0,"Gigapub":0}; localStorage.setItem('ads_date',today); }
 
 // --- ADSGRAM - REAL ADS - BlockID 59790 ---
 const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "59790" }) : null;
 
-function save(){ localStorage.setItem('tap_bal',bal); localStorage.setItem('tap_left',tapsLeft); localStorage.setItem('ads_today',adsToday); localStorage.setItem('ads_total',adsTotal); localStorage.setItem('ad_counts',JSON.stringify(adCounts)); localStorage.setItem('spins',spins); localStorage.setItem('earn_today',todayEarn); render(); }
+function save(){ localStorage.setItem('tap_bal',bal); localStorage.setItem('tap_left',tapsLeft); localStorage.setItem('ads_today',adsToday); localStorage.setItem('ads_total',adsTotal); localStorage.setItem('ad_counts',JSON.stringify(adCounts)); localStorage.setItem('spins',spins); localStorage.setItem('earn_today',todayEarn); localStorage.setItem('referral_earned',referralEarned); render(); }
 function add(n){ bal+=n; todayEarn+=n; save(); }
+function usdValue(tap){ return tap / CONFIG.tapForOneDollar; }
+
+// Check if daily task is completed
+function isDailyTaskCompleted(){ return adsToday >= CONFIG.dailyTaskAds; }
+
+// Give referral reward - only after referred user completes daily task
+function giveReferralReward(referredUserAdsToday){
+  if(referredUserAdsToday >= CONFIG.dailyTaskAds){
+    referralEarned += CONFIG.referralReward;
+    add(CONFIG.referralReward);
+    return true;
+  }
+  return false;
+}
+
 function render(){
   document.querySelectorAll('#balTop,#balEarn,#balWallet').forEach(e=>e.textContent=bal.toFixed(2)+' TAP');
-  document.querySelectorAll('#usdTop,#usdWallet').forEach(e=>e.textContent='$'+(bal*0.001).toFixed(3));
+  document.querySelectorAll('#usdTop,#usdWallet').forEach(e=>e.textContent='$'+usdValue(bal).toFixed(3));
   document.querySelectorAll('#todayTop,#todayEarn').forEach(e=>e.textContent='+'+todayEarn.toFixed(2)+' TAP today');
   document.getElementById('tapLeft').textContent=tapsLeft+' taps left today';
+  // Daily Task progress
+  let pct = Math.min(100, (adsToday / CONFIG.dailyTaskAds) * 100);
+  document.getElementById('dailyTaskBar').style.width = pct + '%';
+  document.getElementById('dailyTaskCount').textContent = adsToday + ' / ' + CONFIG.dailyTaskAds + ' ads' + (isDailyTaskCompleted() ? ' - Daily Task Completed!' : '');
+  document.getElementById('refInfo').textContent = 'You have earned ' + referralEarned.toFixed(0) + ' TAP from referrals. Each friend who completes the daily task = +200 TAP for you.';
   let lastCheckin2 = localStorage.getItem('last_checkin')||'';
   if(lastCheckin2===new Date().toDateString()){
     let b=document.getElementById('checkinBtn');
@@ -99,11 +141,13 @@ function render(){
   let html='';
   [['Monetag','🔵'],['Adsgram','✈️'],['Gigapub','🟢']].forEach(([name,icon])=>{
     let c=adCounts[name]||0;
-    let disabled = adsToday>=5 ? 'disabled' : '';
-    let btnText = adsToday>=5 ? 'Limit Reached' : 'Watch';
-    html+=`<div class="card"><div><h3>${icon} ${name}</h3><p>Watch a ${name} ad</p><p>${c}/10 ads • resets 12h after the first</p></div><div style="text-align:right"><div class="badge">+5 TAP</div><br><br><button class="watch" ${disabled} onclick="watchAd('${name}')"> ${btnText}</button></div></div>`;
+    let networkDone = c >= CONFIG.adsPerNetwork;
+    let dailyDone = adsToday >= CONFIG.totalAdsPerDay;
+    let disabled = (networkDone || dailyDone) ? 'disabled' : '';
+    let btnText = networkDone ? 'Limit Reached - Come Back in 12h' : (dailyDone ? 'Daily Limit Reached' : 'Watch');
+    html+=`<div class="card"><div><h3>${icon} ${name}</h3><p>Watch a ${name} ad</p><p>${c}/${CONFIG.adsPerNetwork} ads • resets 12h after the first</p></div><div style="text-align:right"><div class="badge">+${CONFIG.tapPerAd} TAP</div><br><br><button class="watch" ${disabled} onclick="watchAd('${name}')"> ${btnText}</button></div></div>`;
   });
-  html+=`<div style="padding:0 14px" class="small">Ads watched today: ${adsToday}/5 paid (first 5 per day). Total ads watched: ${adsTotal}. You need 10 total before your first withdrawal.</div>`;
+  html+=`<div style="padding:0 14px" class="small">Ads watched today: ${adsToday}/${CONFIG.totalAdsPerDay} paid (90 per day). Total ads watched: ${adsTotal}. Daily Task: ${adsToday}/${CONFIG.dailyTaskAds} ads. You need ${CONFIG.minAdsForWithdraw} total ads before your first withdrawal.</div>`;
   document.getElementById('adCards').innerHTML=html;
   document.getElementById('spinInfo').textContent = spins==0 ? '1st Spin FREE - tap SPIN NOW' : 'Next spins = Watch 1 Ad to Spin. Spins used: '+spins;
 }
@@ -117,20 +161,19 @@ function watchAd(name){
   if(name==='Adsgram'){
     if(!AdController){ alert('Adsgram not loaded. Check internet and try again.'); return; }
     AdController.show().then((result)=>{
-      // User watched full ad
       adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++;
-      add(5);
-      alert('You earned +5 TAP from Adsgram');
+      add(CONFIG.tapPerAd);
+      alert('You earned +'+CONFIG.tapPerAd+' TAP from Adsgram');
     }).catch((result)=>{
-      alert('Watch the full ad to get +5 TAP');
+      alert('Watch the full ad to get +'+CONFIG.tapPerAd+' TAP');
     });
     return;
   }
   // Other networks - still simulated for now
-  if(!confirm('Simulated '+name+' ad (15s). In the real app, a real ad will show here. Press OK to earn +5 TAP.')) return;
+  if(!confirm('Simulated '+name+' ad (15s). In the real app, a real ad will show here. Press OK to earn +'+CONFIG.tapPerAd+' TAP.')) return;
   adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++;
-  add(5);
-  alert('You earned +5 TAP from '+name);
+  add(CONFIG.tapPerAd);
+  alert('You earned +'+CONFIG.tapPerAd+' TAP from '+name);
 }
 function doSpin(){
   if(spins>0){
@@ -159,14 +202,14 @@ function dice(){
 }
 function copyRef(){ navigator.clipboard.writeText(document.getElementById('refLink').value); alert('Link copied!'); }
 function withdraw(){
-  if(bal<2000){ alert('You need 2,000 TAP ($2.00) to withdraw. You have '+bal.toFixed(0)); return; }
-  if(adsTotal<10){ alert('You must watch at least 10 ads total before your first withdrawal. You have watched '+adsTotal); return; }
+  if(bal<CONFIG.minWithdrawTap){ alert('You need '+CONFIG.minWithdrawTap+' TAP ($'+CONFIG.minWithdrawUsd.toFixed(2)+') to withdraw. You have '+bal.toFixed(0)); return; }
+  if(adsTotal<CONFIG.minAdsForWithdraw){ alert('You must watch at least '+CONFIG.minAdsForWithdraw+' ads total before your first withdrawal. You have watched '+adsTotal); return; }
   if(!document.getElementById('walletAddr').value){ alert('Please enter your USDT wallet address'); return; }
-  bal-=2000; save();
-  document.getElementById('wdMsg').textContent='✅ Withdrawal request sent! $1.90 will arrive within 24 hours. We will post it in Payout Proofs.';
+  bal-=CONFIG.minWithdrawTap; save();
+  document.getElementById('wdMsg').textContent='✅ Withdrawal request sent! $0.95 will arrive within 24 hours. We will post it in Payout Proofs.';
 }
 render();
 if(window.Telegram?.WebApp) Telegram.WebApp.ready();
 </script>
 </body>
-  </html>
+                      </html>
