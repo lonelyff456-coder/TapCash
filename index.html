@@ -6,6 +6,7 @@
 <title>TapCash Arena</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://adsgram.ai/js/adsgram.js"></script>
+<script src='//libtl.com/sdk.js' data-zone='12265858' data-sdk='show_12265858'></script>
 <style>
 *{box-sizing:border-box;font-family:Arial,sans-serif}
 body{margin:0;background:#0a0a0a;color:#fff;padding-bottom:80px}
@@ -76,17 +77,17 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
 <script>
 // ===== TapCash Arena - Settings in English =====
 const CONFIG = {
-  adsPerNetwork: 15, // 15 ads per network per 12 hours
-  totalAdsPerDay: 90, // 15 x 3 networks x 2 = 90 ads per day
-  resetHours: 12, // Ads reset 12 hours after the first ad
-  tapPerAd: 5, // User earns 5 TAP per ad
-  tapForOneDollar: 1350, // 1350 TAP = $1.00
-  minWithdrawTap: 1350, // Minimum withdraw
+  adsPerNetwork: 15,
+  totalAdsPerDay: 90,
+  resetHours: 12,
+  tapPerAd: 5,
+  tapForOneDollar: 1350,
+  minWithdrawTap: 1350,
   minWithdrawUsd: 1.00,
-  withdrawFee: 0.05, // Fee
-  dailyTaskAds: 45, // Daily task = 45 ads
-  referralReward: 200, // Referrer gets 200 TAP after friend completes daily task
-  minAdsForWithdraw: 270 // 3 days x 90 ads
+  withdrawFee: 0.05,
+  dailyTaskAds: 45,
+  referralReward: 200,
+  minAdsForWithdraw: 270
 };
 
 let bal = parseFloat(localStorage.getItem('tap_bal')||0);
@@ -109,11 +110,7 @@ const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "59790" }) 
 function save(){ localStorage.setItem('tap_bal',bal); localStorage.setItem('tap_left',tapsLeft); localStorage.setItem('ads_today',adsToday); localStorage.setItem('ads_total',adsTotal); localStorage.setItem('ad_counts',JSON.stringify(adCounts)); localStorage.setItem('spins',spins); localStorage.setItem('earn_today',todayEarn); localStorage.setItem('referral_earned',referralEarned); render(); }
 function add(n){ bal+=n; todayEarn+=n; save(); }
 function usdValue(tap){ return tap / CONFIG.tapForOneDollar; }
-
-// Check if daily task is completed
 function isDailyTaskCompleted(){ return adsToday >= CONFIG.dailyTaskAds; }
-
-// Give referral reward - only after referred user completes daily task
 function giveReferralReward(referredUserAdsToday){
   if(referredUserAdsToday >= CONFIG.dailyTaskAds){
     referralEarned += CONFIG.referralReward;
@@ -122,13 +119,11 @@ function giveReferralReward(referredUserAdsToday){
   }
   return false;
 }
-
 function render(){
   document.querySelectorAll('#balTop,#balEarn,#balWallet').forEach(e=>e.textContent=bal.toFixed(2)+' TAP');
   document.querySelectorAll('#usdTop,#usdWallet').forEach(e=>e.textContent='$'+usdValue(bal).toFixed(3));
   document.querySelectorAll('#todayTop,#todayEarn').forEach(e=>e.textContent='+'+todayEarn.toFixed(2)+' TAP today');
   document.getElementById('tapLeft').textContent=tapsLeft+' taps left today';
-  // Daily Task progress
   let pct = Math.min(100, (adsToday / CONFIG.dailyTaskAds) * 100);
   document.getElementById('dailyTaskBar').style.width = pct + '%';
   document.getElementById('dailyTaskCount').textContent = adsToday + ' / ' + CONFIG.dailyTaskAds + ' ads' + (isDailyTaskCompleted() ? ' - Daily Task Completed!' : '');
@@ -157,6 +152,18 @@ function doTap(){
   tapsLeft--; add(0.1);
 }
 function watchAd(name){
+  // ===== MONETAG - REAL ADS - Zone 12265858 =====
+  if(name==='Monetag'){
+    if(typeof show_12265858 !== 'function'){ alert('Monetag not loaded yet. Check internet and try again.'); return; }
+    show_12265858().then(()=>{
+      adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++;
+      add(CONFIG.tapPerAd);
+      alert('You earned +'+CONFIG.tapPerAd+' TAP from Monetag');
+    }).catch(()=>{
+      alert('Watch the full ad to get +'+CONFIG.tapPerAd+' TAP');
+    });
+    return;
+  }
   // REAL ADSGRAM AD
   if(name==='Adsgram'){
     if(!AdController){ alert('Adsgram not loaded. Check internet and try again.'); return; }
@@ -169,47 +176,11 @@ function watchAd(name){
     });
     return;
   }
-  // Other networks - still simulated for now
+  // Gigapub - still simulated for now
   if(!confirm('Simulated '+name+' ad (15s). In the real app, a real ad will show here. Press OK to earn +'+CONFIG.tapPerAd+' TAP.')) return;
   adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++;
   add(CONFIG.tapPerAd);
   alert('You earned +'+CONFIG.tapPerAd+' TAP from '+name);
 }
 function doSpin(){
-  if(spins>0){
-    if(!confirm('Watch 1 Ad to Spin?')) return;
-    adsToday++; adsTotal++;
-  }
-  spins++;
-  let r=Math.random()*100, win=5;
-  if(r<70) win=5; else if(r<90) win=10; else if(r<99) win=15; else win=50;
-  add(win);
-  document.getElementById('spinResult').textContent='🎉 You won +'+win+' TAP!';
-}
-function checkin(){
-  let lastCheckin = localStorage.getItem('last_checkin')||'';
-  let todayStr = new Date().toDateString();
-  if(lastCheckin===todayStr){ alert('You have already claimed your check-in today. Please come back tomorrow!'); return; }
-  localStorage.setItem('last_checkin', todayStr);
-  add(10); alert('Daily Check-in +10 TAP');
-  document.getElementById('checkinBtn').textContent='✅ Claimed Today - Come Back Tomorrow';
-  document.getElementById('checkinBtn').disabled=true;
-}
-function dice(){
-  let g=prompt('Guess 1 to 6'); if(!g) return;
-  let roll=Math.floor(Math.random()*6)+1;
-  if(parseInt(g)==roll){ add(10); alert('You won! The roll was '+roll+' +10 TAP'); } else { alert('The roll was '+roll+'. Try again.'); }
-}
-function copyRef(){ navigator.clipboard.writeText(document.getElementById('refLink').value); alert('Link copied!'); }
-function withdraw(){
-  if(bal<CONFIG.minWithdrawTap){ alert('You need '+CONFIG.minWithdrawTap+' TAP ($'+CONFIG.minWithdrawUsd.toFixed(2)+') to withdraw. You have '+bal.toFixed(0)); return; }
-  if(adsTotal<CONFIG.minAdsForWithdraw){ alert('You must watch at least '+CONFIG.minAdsForWithdraw+' ads total before your first withdrawal. You have watched '+adsTotal); return; }
-  if(!document.getElementById('walletAddr').value){ alert('Please enter your USDT wallet address'); return; }
-  bal-=CONFIG.minWithdrawTap; save();
-  document.getElementById('wdMsg').textContent='✅ Withdrawal request sent! $0.95 will arrive within 24 hours. We will post it in Payout Proofs.';
-}
-render();
-if(window.Telegram?.WebApp) Telegram.WebApp.ready();
-</script>
-</body>
-                      </html>
+  if(spins>0
