@@ -4,9 +4,17 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"TapCash Bot is running!")
+        try:
+            with open("index.html", "rb") as f:
+                content = f.read()
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(content)
+        except:
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"TapCash Bot is running!")
     def log_message(self, *args):
         pass
 
@@ -57,8 +65,7 @@ def main_menu():
     markup.add(
         types.InlineKeyboardButton("👆 TAP +10", callback_data="tap"),
         types.InlineKeyboardButton("💰 BALANCE", callback_data="balance"),
-        types.InlineKeyboardButton("🎮 PLAY TAPCASH ARENA", callback_data="play")
-    )
+        types.InlineKeyboardButton("🎮 PLAY TAPCASH ARENA", web_app=types.WebAppInfo(url="https://tapcash-2.onrender.com"))
     return markup
 
 @bot.message_handler(commands=['start'])
