@@ -1,6 +1,9 @@
 import os
 import threading
+import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import telebot
+from telebot import types
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -15,7 +18,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
             self.wfile.write(b"TapCash Bot is running!")
-    def log_message(self, *args):
+    def log_message(self, format, *args):
         pass
 
 def run_server():
@@ -24,14 +27,8 @@ def run_server():
 
 threading.Thread(target=run_server, daemon=True).start()
 
-import telebot
-from telebot import types
-import json
-import os
-
 TOKEN = os.environ.get("BOT_TOKEN", "")
 bot = telebot.TeleBot(TOKEN)
-
 FILE = "users.json"
 
 def load_users():
@@ -51,13 +48,13 @@ def get_user(user_id):
     users = load_users()
     uid = str(user_id)
     if uid not in users:
-        users[uid] = {'balance': 200, 'taps': 0}
+        users[uid] = {"balance": 200, "taps": 0}
         save_users(users)
     return users[uid]
 
 def update_user(user_id, balance, taps):
     users = load_users()
-    users[str(user_id)] = {'balance': balance, 'taps': taps}
+    users[str(user_id)] = {"balance": balance, "taps": taps}
     save_users(users)
 
 def main_menu():
@@ -66,13 +63,14 @@ def main_menu():
         types.InlineKeyboardButton("👆 TAP +10", callback_data="tap"),
         types.InlineKeyboardButton("💰 BALANCE", callback_data="balance"),
         types.InlineKeyboardButton("🎮 PLAY TAPCASH ARENA", web_app=types.WebAppInfo(url="https://tapcash-2.onrender.com"))
+    )
     return markup
 
 @bot.message_handler(commands=['start'])
 def start(message):
     user = get_user(message.from_user.id)
     name = message.from_user.first_name
-    bot.send_message(message.chat.id, f"👋 Welcome {name} to TapCash Arena!\n\n💰 Balance: {user['balance']} coins\n👆 Taps: {user['taps']}\n\nPress TAP +10 to earn!", reply_markup=main_menu())
+    bot.send_message(message.chat.id, f"Welcome {name} to TapCash Arena!\n\nBalance: {user['balance']} coins\nTaps: {user['taps']}\n\nPress TAP +10 to earn!", reply_markup=main_menu())
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_button(call):
@@ -83,18 +81,13 @@ def handle_button(call):
         user['taps'] += 1
         update_user(call.from_user.id, user['balance'], user['taps'])
         try:
-            bot.answer_callback_query(call.id, " +10 coins! 🎉")
+            bot.answer_callback_query(call.id, "+10 coins! 🪙")
         except:
             pass
-        text = f"👋 Welcome {name} to TapCash Arena!\n\n💰 Balance: {user['balance']} coins\n👆 Taps: {user['taps']}\n\nYou tapped! +10 coins added!"
+        bot.edit_message_text(f"Welcome {name} to TapCash Arena!\n\nBalance: {user['balance']} coins\nTaps: {user['taps']}\n\n+10 coins added!\n\nPress TAP +10 to earn!", call.message.chat.id, call.message.message_id, reply_markup=main_menu())
     elif call.data == "balance":
-        text = f"💰 Your Balance: {user['balance']} coins\n👆 Total Taps: {user['taps']}"
-    elif call.data == "play":
-        text = f"🎮 TAPCASH ARENA - GAME MODE 🎮\n\n👋 {name}, you are IN the Arena now!\n\n💰 Balance: {user['balance']} coins\n👆 Taps: {user['taps']}\n\n⚡ TAP AS FAST AS YOU CAN!"
-    try:
-        bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=main_menu())
-    except:
-        pass
+        bot.answer_callback_query(call.id, f"Balance: {user['balance']} coins")
+        bot.send_message(call.message.chat.id, f"💰 Your Balance: {user['balance']} coins\nTotal Taps: {user['taps']}\n\nKeep tapping!", reply_markup=main_menu())
 
 print("TapCash Arena Bot is running...")
 bot.infinity_polling()
