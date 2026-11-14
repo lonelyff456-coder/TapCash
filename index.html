@@ -38,8 +38,8 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
   <div class="top"><div style="font-weight:800">TAPCASH ARENA</div><div class="balance" id="balTop">0 TAP</div><div class="usd" id="usdTop">$0.00</div><div class="sub" id="todayTop">+0 TAP today</div></div>
   <div class="coin" onclick="doTap()">TAP</div>
   <div style="text-align:center" id="tapLeft">500 taps left today</div>
-  <div class="box"><b>🎁 Daily Check-in</b><p class="small">Day 1 = 10 TAP, Day 2 = 20 TAP... Day 7 = 70 TAP. Miss 1 day, e reset.</p><button class="btn" id="checkinBtn" onclick="checkin()">Claim Check-in</button></div>
-  <div class="box"><b>🏆 Top Earners</b><p class="small">Top 10 for week go share $10. No 1 = $3, No 2 = $2.</p></div>
+  <div class="box"><b>🎁 Daily Check-in</b><p class="small">Day 1 = 10 TAP, Day 2 = 20 TAP... Day 7 = 70 TAP. Miss 1 day and it resets.</p><button class="btn" id="checkinBtn" onclick="checkin()">Claim Check-in</button></div>
+  <div class="box"><b>🏆 Top Earners</b><p class="small">Top 10 for the week will share $10. No. 1 = $3, No. 2 = $2.</p></div>
 </div>
 <div id="earnPage" class="hidden">
   <div class="top"><div style="font-weight:800">EARN CENTER - Complete Tasks</div><div class="balance" id="balEarn">0 TAP</div><div class="sub" id="todayEarn">+0 TAP today</div></div>
@@ -50,15 +50,15 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
 <div id="arenaPage" class="hidden">
   <div class="top"><h2>ARENA</h2><p class="small">12 plays per day. After 12, watch 1 ad for +2 plays.</p></div>
   <div class="box"><b>🎲 Lucky Dice</b><p class="small">Guess 1-6. Correct = win double.</p><button class="btn" onclick="dice()">Play Dice - 5 TAP Win</button></div>
-  <div class="box"><b>🔍 Word Search • ❌⭕ Tic-Tac-Toe • 🎵 Beat Tap • 🚀 Space Dodger</b><p class="small">Coming in Week 2. Tap game already live for now.</p></div>
+  <div class="box"><b>🔍 Word Search • ❌⭕ Tic-Tac-Toe • 🎵 Beat Tap • 🚀 Space Dodger</b><p class="small">Coming in Week 2. Tap game is already live for now.</p></div>
 </div>
 <div id="friendsPage" class="hidden">
-  <div class="top"><h2>FRIENDS</h2><p class="small">Invite friend. When dem reach $0.50, you get $0.10 = 100 TAP bonus.</p></div>
+  <div class="top"><h2>FRIENDS</h2><p class="small">Invite a friend. When they reach $0.50, you get $0.10 = 100 TAP bonus.</p></div>
   <div class="box"><b>Your Link</b><input id="refLink" readonly value="https://t.me/YourBot?start=YOUR_ID"><button class="btn" onclick="copyRef()">Copy Invite Link</button></div>
 </div>
 <div id="walletPage" class="hidden">
   <div class="top"><h2>WALLET</h2><div class="balance" id="balWallet">0 TAP</div><div class="usd" id="usdWallet">$0.00</div></div>
-  <div class="box"><b>Withdraw - Min $2.00 (2,000 TAP)</b><p class="small">Fee: $0.10. You go receive $1.90. Within 24 hours. You must watch at least 10 ads total before first withdraw.</p><input id="walletAddr" placeholder="Your USDT (TRC20) wallet address"><button class="btn" onclick="withdraw()">Request Withdraw</button><p class="small" id="wdMsg"></p></div>
+  <div class="box"><b>Withdraw - Min $2.00 (2,000 TAP)</b><p class="small">Fee: $0.10. You will receive $1.90. Within 24 hours. You must watch at least 10 ads total before your first withdrawal.</p><input id="walletAddr" placeholder="Your USDT (TRC20) wallet address"><button class="btn" onclick="withdraw()">Request Withdraw</button><p class="small" id="wdMsg"></p></div>
   <div class="box"><b>📜 Payout Proofs</b><p class="small">po*** - $2.00 - 13 Nov 2026<br>jo*** - $2.00 - 13 Nov 2026</p></div>
 </div>
 <div class="nav">
@@ -96,22 +96,22 @@ function render(){
     let c=adCounts[name]||0;
     let disabled = adsToday>=5 ? 'disabled' : '';
     let btnText = adsToday>=5 ? 'Limit Reached' : 'Watch';
-    html+=`<div class="card"><div><h3>${icon} ${name}</h3><p>Watch an ${name} ad</p><p>${c}/10 ads • resets 12h after the first</p></div><div style="text-align:right"><div class="badge">+5 TAP</div><br><br><button class="watch" ${disabled} onclick="watchAd('${name}')"> ${btnText}</button></div></div>`;
+    html+=`<div class="card"><div><h3>${icon} ${name}</h3><p>Watch a ${name} ad</p><p>${c}/10 ads • resets 12h after the first</p></div><div style="text-align:right"><div class="badge">+5 TAP</div><br><br><button class="watch" ${disabled} onclick="watchAd('${name}')"> ${btnText}</button></div></div>`;
   });
-  html+=`<div style="padding:0 14px" class="small">Ads watched today: ${adsToday}/5 paid (first 5 per day). Total ads watched: ${adsTotal}. You need 10 total before first withdraw.</div>`;
+  html+=`<div style="padding:0 14px" class="small">Ads watched today: ${adsToday}/5 paid (first 5 per day). Total ads watched: ${adsTotal}. You need 10 total before your first withdrawal.</div>`;
   document.getElementById('adCards').innerHTML=html;
   document.getElementById('spinInfo').textContent = spins==0 ? '1st Spin FREE - tap SPIN NOW' : 'Next spins = Watch 1 Ad to Spin. Spins used: '+spins;
 }
 function show(id,el){ ['homePage','earnPage','arenaPage','friendsPage','walletPage'].forEach(p=>document.getElementById(p).classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); document.querySelectorAll('.nav div').forEach(d=>d.classList.remove('active')); el.classList.add('active'); window.scrollTo(0,0); }
 function doTap(){
-  if(tapsLeft<=0){ alert('You don finish taps for today. Watch 1 Ad to get +100 extra taps.'); return; }
+  if(tapsLeft<=0){ alert('You have finished your taps for today. Watch 1 Ad to get +100 extra taps.'); return; }
   tapsLeft--; add(0.1);
 }
 function watchAd(name){
-  if(!confirm('Simulated '+name+' ad (15s). In real app, real ad go show here. Press OK to earn +5 TAP.')) return;
+  if(!confirm('Simulated '+name+' ad (15s). In the real app, a real ad will show here. Press OK to earn +5 TAP.')) return;
   adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++;
   add(5);
-  alert('You earn +5 TAP from '+name);
+  alert('You earned +5 TAP from '+name);
 }
 function doSpin(){
   if(spins>0){
@@ -122,12 +122,12 @@ function doSpin(){
   let r=Math.random()*100, win=5;
   if(r<70) win=5; else if(r<90) win=10; else if(r<99) win=15; else win=50;
   add(win);
-  document.getElementById('spinResult').textContent='🎉 You win +'+win+' TAP!';
+  document.getElementById('spinResult').textContent='🎉 You won +'+win+' TAP!';
 }
 function checkin(){
   let lastCheckin = localStorage.getItem('last_checkin')||'';
   let todayStr = new Date().toDateString();
-  if(lastCheckin===todayStr){ alert('You don claim check-in today already. Come back tomorrow!'); return; }
+  if(lastCheckin===todayStr){ alert('You have already claimed your check-in today. Please come back tomorrow!'); return; }
   localStorage.setItem('last_checkin', todayStr);
   add(10); alert('Daily Check-in +10 TAP');
   document.getElementById('checkinBtn').textContent='✅ Claimed Today - Come Back Tomorrow';
@@ -136,15 +136,15 @@ function checkin(){
 function dice(){
   let g=prompt('Guess 1 to 6'); if(!g) return;
   let roll=Math.floor(Math.random()*6)+1;
-  if(parseInt(g)==roll){ add(10); alert('You win! Roll was '+roll+' +10 TAP'); } else { alert('Roll was '+roll+'. Try again.'); }
+  if(parseInt(g)==roll){ add(10); alert('You won! The roll was '+roll+' +10 TAP'); } else { alert('The roll was '+roll+'. Try again.'); }
 }
 function copyRef(){ navigator.clipboard.writeText(document.getElementById('refLink').value); alert('Link copied!'); }
 function withdraw(){
   if(bal<2000){ alert('You need 2,000 TAP ($2.00) to withdraw. You have '+bal.toFixed(0)); return; }
-  if(adsTotal<10){ alert('You must watch at least 10 ads total before first withdraw. You have watched '+adsTotal); return; }
-  if(!document.getElementById('walletAddr').value){ alert('Enter your USDT wallet address'); return; }
+  if(adsTotal<10){ alert('You must watch at least 10 ads total before your first withdrawal. You have watched '+adsTotal); return; }
+  if(!document.getElementById('walletAddr').value){ alert('Please enter your USDT wallet address'); return; }
   bal-=2000; save();
-  document.getElementById('wdMsg').textContent='✅ Withdraw request sent! $1.90 go come within 24 hours. We go post am for Payout Proofs.';
+  document.getElementById('wdMsg').textContent='✅ Withdrawal request sent! $1.90 will arrive within 24 hours. We will post it in Payout Proofs.';
 }
 render();
 if(window.Telegram?.WebApp) Telegram.WebApp.ready();
