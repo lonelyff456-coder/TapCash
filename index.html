@@ -254,3 +254,140 @@ function checkin(){
   add(reward); alert('Daily Check-in +'+reward+' TAP');
 }
                           </script>
+<script>
+var QUIZZES = {
+  Nigeria: [
+    {q:"What is the capital of Nigeria?", opts:["Abuja","Lagos"], ans:"Abuja"},
+    {q:"What is the currency of Nigeria?", opts:["Naira","Cedi"], ans:"Naira"},
+    {q:"Which river is the longest in Nigeria?", opts:["River Niger","River Benue"], ans:"River Niger"}
+  ],
+  Ghana: [
+    {q:"What is the capital of Ghana?", opts:["Accra","Kumasi"], ans:"Accra"},
+    {q:"What is the currency of Ghana?", opts:["Cedi","Naira"], ans:"Cedi"},
+    {q:"Which festival is famous in Ghana?", opts:["Homowo","Durbar"], ans:"Homowo"}
+  ],
+  Kenya: [
+    {q:"What is the capital of Kenya?", opts:["Nairobi","Mombasa"], ans:"Nairobi"},
+    {q:"What is the currency of Kenya?", opts:["Shilling","Rand"], ans:"Shilling"},
+    {q:"Which animal is famous in Maasai Mara?", opts:["Lion","Penguin"], ans:"Lion"}
+  ],
+  "South Africa": [
+    {q:"What is the capital of South Africa?", opts:["Pretoria","Cape Town"], ans:"Pretoria"},
+    {q:"What is the currency of South Africa?", opts:["Rand","Cedi"], ans:"Rand"}
+  ],
+  Cameroon: [
+    {q:"What is the capital of Cameroon?", opts:["Yaounde","Douala"], ans:"Yaounde"},
+    {q:"What is the currency of Cameroon?", opts:["CFA Franc","Naira"], ans:"CFA Franc"}
+  ],
+  Uganda: [
+    {q:"What is the capital of Uganda?", opts:["Kampala","Entebbe"], ans:"Kampala"},
+    {q:"What is the currency of Uganda?", opts:["Shilling","Rand"], ans:"Shilling"}
+  ],
+  India: [
+    {q:"What is the capital of India?", opts:["New Delhi","Mumbai"], ans:"New Delhi"},
+    {q:"What is the currency of India?", opts:["Rupee","Taka"], ans:"Rupee"}
+  ],
+  Pakistan: [
+    {q:"What is the capital of Pakistan?", opts:["Islamabad","Karachi"], ans:"Islamabad"},
+    {q:"What is the currency of Pakistan?", opts:["Rupee","Dinar"], ans:"Rupee"}
+  ],
+  Bangladesh: [
+    {q:"What is the capital of Bangladesh?", opts:["Dhaka","Chittagong"], ans:"Dhaka"},
+    {q:"What is the currency of Bangladesh?", opts:["Taka","Rupee"], ans:"Taka"}
+  ],
+  Philippines: [
+    {q:"What is the capital of Philippines?", opts:["Manila","Cebu"], ans:"Manila"},
+    {q:"What is the currency of Philippines?", opts:["Peso","Ringgit"], ans:"Peso"}
+  ],
+  Indonesia: [
+    {q:"What is the capital of Indonesia?", opts:["Jakarta","Bali"], ans:"Jakarta"},
+    {q:"What is the currency of Indonesia?", opts:["Rupiah","Ringgit"], ans:"Rupiah"}
+  ],
+  USA: [
+    {q:"What is the capital of USA?", opts:["Washington","New York"], ans:"Washington"},
+    {q:"What is the currency of USA?", opts:["Dollar","Euro"], ans:"Dollar"}
+  ],
+  UK: [
+    {q:"What is the capital of UK?", opts:["London","Manchester"], ans:"London"},
+    {q:"What is the currency of UK?", opts:["Pound","Euro"], ans:"Pound"}
+  ],
+  Brazil: [
+    {q:"What is the capital of Brazil?", opts:["Brasilia","Rio"], ans:"Brasilia"},
+    {q:"What is the currency of Brazil?", opts:["Real","Peso"], ans:"Real"}
+  ]
+};
+function getQuizCountry(){ try{ return localStorage.getItem('quiz_country') || 'Nigeria'; }catch(e){ return 'Nigeria'; } }
+function changeCountry(){
+  var c = document.getElementById('quizCountry').value;
+  try{ localStorage.setItem('quiz_country', c); }catch(e){}
+  loadQuiz();
+}
+function loadQuiz(){
+  try{
+  var country = getQuizCountry();
+  var sel = document.getElementById('quizCountry');
+  if(sel) sel.value = country;
+  var list = QUIZZES[country] || QUIZZES['Nigeria'];
+  var dayNum = new Date().getDate();
+  var q = list[dayNum % list.length];
+  var qEl = document.getElementById('quizQ');
+  if(qEl) qEl.textContent = q.q;
+  var optEl = document.getElementById('quizOptions');
+  if(optEl){
+    optEl.innerHTML = '';
+    q.opts.forEach(function(o){
+      var b = document.createElement('button');
+      b.className = 'btn btn-secondary';
+      b.textContent = o;
+      b.onclick = function(){ answerQuiz(o); };
+      optEl.appendChild(b);
+    });
+  }
+  var resEl = document.getElementById('quizResult');
+  if(resEl){
+    if(localStorage.getItem('quiz_done')===today){ resEl.textContent='Completed today. Come back tomorrow.'; }
+    else { resEl.textContent=''; }
+  }
+  window._currentQuiz = q;
+  }catch(e){}
+}
+function answerQuiz(ans){
+  if(localStorage.getItem('quiz_done')===today){ alert('You have already completed the quiz today.'); return; }
+  var q = window._currentQuiz;
+  if(!q) return;
+  if(ans===q.ans){ localStorage.setItem('quiz_done',today); add(50); document.getElementById('quizResult').textContent='Correct! +50 TAP'; }
+  else { document.getElementById('quizResult').textContent='Wrong answer. Try again tomorrow.'; }
+}
+function playDice(g){
+  if(arenaState.plays >= CONFIG.arenaMaxPlays){ alert('You have used all your plays for today. Come back tomorrow.'); return; }
+  var roll=Math.floor(Math.random()*6)+1;
+  arenaState.plays++; saveArena();
+  if(g==roll){ add(10); document.getElementById('diceResult').textContent='You won! You picked '+g+', roll was '+roll+' +10 TAP'; }
+  else { document.getElementById('diceResult').textContent='You picked '+g+', roll was '+roll+'. Try again!'; }
+  render();
+}
+function playSimpleGame(name){
+  if(arenaState.plays >= CONFIG.arenaMaxPlays){ alert('You have used all your plays for today. Come back tomorrow.'); return; }
+  arenaState.plays++; saveArena();
+  var win = Math.floor(Math.random()*30)+10;
+  add(win);
+  document.getElementById('gameResult').textContent=name+' finished! You earned +'+win+' TAP';
+  render();
+}
+function copyRef(){ try{ navigator.clipboard.writeText(document.getElementById('refLink').value); }catch(e){} alert('Link copied!'); }
+function withdraw(amount){
+  var needTap = amount * CONFIG.tapForOneDollar;
+  if(amount < CONFIG.minWithdrawUsd){ alert('Minimum withdrawal is $1.'); return; }
+  if(withdrawnToday + amount > CONFIG.maxWithdrawUsdPerDay){ alert('Daily limit is $3 per day. You have already withdrawn $'+withdrawnToday+' today.'); return; }
+  if(bal < needTap){ alert('Not enough balance. You need '+needTap+' TAP for $'+amount+'.'); return; }
+  var addr = document.getElementById('walletAddr').value.trim();
+  if(!addr){ alert('Please enter your USDT BEP20 wallet address.'); return; }
+  if(!addr.startsWith('0x') || addr.length < 20){ alert('Invalid address. Your USDT BEP20 address must start with 0x.'); return; }
+  bal -= needTap; withdrawnToday += amount; save();
+  document.getElementById('wdMsg').textContent='Withdrawal request sent! $'+amount+' USDT (BEP20) will arrive within 24 hours to '+addr+'.';
+}
+render();
+try{ if(window.Telegram && window.Telegram.WebApp){ Telegram.WebApp.ready(); Telegram.WebApp.expand(); } }catch(e){}
+</script>
+</body>
+</html>
