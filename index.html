@@ -39,8 +39,6 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #333;ba
 </style>
 </head>
 <body>
-
-<!-- HOME -->
 <div id="homePage">
   <div class="top"><div style="font-weight:800">TAPCASH ARENA</div><div class="balance" id="balTop">0 TAP</div><div class="usd" id="usdTop">$0.00</div><div class="sub" id="todayTop">+0 TAP today</div></div>
   <div class="coin" onclick="doTap()">TAP</div>
@@ -49,8 +47,6 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #333;ba
   <div class="box"><b>✅ Daily Progress</b><p class="small">Complete your tasks today to keep earning.</p><div class="progress"><div id="dailyTaskBar"></div></div><p class="small" id="dailyTaskCount">0 / 80 ads</p></div>
   <div class="box"><b>🏆 Top Earners</b><p class="small">Top 10 for the week will share $10. No. 1 = $3, No. 2 = $2.</p></div>
 </div>
-
-<!-- EARN -->
 <div id="earnPage" class="hidden">
   <div class="top"><div style="font-weight:800">EARN CENTER</div><div class="balance" id="balEarn">0 TAP</div><div class="sub" id="todayEarn">+0 TAP today</div></div>
   <div id="adCards"></div>
@@ -78,8 +74,6 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #333;ba
     <p class="small" id="quizResult"></p>
   </div>
 </div>
-
-<!-- ARENA -->
 <div id="arenaPage" class="hidden">
   <div class="top"><h2>ARENA</h2><p class="small" id="arenaPlaysText">8 plays per day</p></div>
   <div class="box"><b>🎲 Lucky Dice</b><p class="small">Pick 1-6. Correct = win +10 TAP!</p>
@@ -99,15 +93,11 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #333;ba
     <div class="game-card" onclick="playSimpleGame('Space Dodger')">🚀<br>Space Dodger</div>
   </div><p class="small" id="gameResult"></p></div>
 </div>
-
-<!-- FRIENDS -->
 <div id="friendsPage" class="hidden">
   <div class="top"><h2>FRIENDS</h2><p class="small">Invite friends and earn 20% of what they earn, forever.</p></div>
   <div class="box"><b>Your Link</b><input id="refLink" readonly value="https://t.me/tapcash_arena_game_bot?start=YOUR_ID"><button class="btn" onclick="copyRef()">Copy Invite Link</button></div>
   <div class="box"><b>Referral Earnings</b><p class="small" id="refInfo">You have earned 0 TAP from referrals.</p></div>
 </div>
-
-<!-- WALLET -->
 <div id="walletPage" class="hidden">
   <div class="top"><h2>WALLET</h2><div class="balance" id="balWallet">0 TAP</div><div class="usd" id="usdWallet">$0.00</div></div>
   <div class="box"><b>Withdraw</b><p class="small">USDT (BEP20) on BNB Smart Chain only.</p>
@@ -121,7 +111,6 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #333;ba
   <p class="small">Daily limit: $3 per day.</p></div>
   <div class="box"><b>📜 Payout Proofs</b><p class="small">po*** - $1.00 - 14 Nov 2026<br>jo*** - $1.00 - 14 Nov 2026</p></div>
 </div>
-
 <div class="nav">
   <div onclick="show('homePage',this)" class="active">🏠<br>Home</div>
   <div onclick="show('earnPage',this)">🎁<br>Earn</div>
@@ -129,7 +118,6 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #333;ba
   <div onclick="show('friendsPage',this)">👥<br>Friends</div>
   <div onclick="show('walletPage',this)">💰<br>Wallet</div>
 </div>
-
 <script>
 const CONFIG = {
   tapForOneDollar: 2000,
@@ -149,7 +137,6 @@ const CONFIG = {
   },
   totalAdsPerDay: 80
 };
-
 let bal = parseFloat(localStorage.getItem('tap_bal')||0);
 let tapsLeft = parseInt(localStorage.getItem('tap_left')||500);
 let today = new Date().toDateString();
@@ -170,11 +157,9 @@ let arenaState = JSON.parse(localStorage.getItem('arena_state') || '{"plays":0,"
 if(arenaState.date !== today){ arenaState.plays=0; arenaState.date=today; saveArena(); }
 function saveArena(){ localStorage.setItem('arena_state', JSON.stringify(arenaState)); }
 const AdController = window.Adsgram ? window.Adsgram.init({ blockId: "59790" }) : null;
-
 function save(){ localStorage.setItem('tap_bal',bal); localStorage.setItem('tap_left',tapsLeft); localStorage.setItem('ads_today',adsToday); localStorage.setItem('ad_counts',JSON.stringify(adCounts)); localStorage.setItem('spins',spins); localStorage.setItem('earn_today',todayEarn); localStorage.setItem('referral_earned',referralEarned); localStorage.setItem('withdrawn_today',withdrawnToday); render(); }
 function add(n){ bal+=n; todayEarn+=n; save(); }
 function usdValue(tap){ return tap / CONFIG.tapForOneDollar; }
-
 function render(){
   document.querySelectorAll('#balTop,#balEarn,#balWallet').forEach(e=>e.textContent=bal.toFixed(0)+' TAP');
   document.querySelectorAll('#usdTop,#usdWallet').forEach(e=>e.textContent='$'+usdValue(bal).toFixed(2));
@@ -211,7 +196,6 @@ function render(){
   document.getElementById('arenaPlaysText').textContent = 'Plays used today: ' + arenaState.plays + ' / ' + CONFIG.arenaMaxPlays;
   loadQuiz();
 }
-
 function show(id,el){
   ['homePage','earnPage','arenaPage','friendsPage','walletPage'].forEach(p=>document.getElementById(p).classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
@@ -264,67 +248,65 @@ function checkin(){
   checkinDay++; localStorage.setItem('checkin_day', checkinDay);
   add(reward); alert('Daily Check-in +'+reward+' TAP');
 }
-
-// --- QUIZ BY COUNTRY - PERMANENT, CAN CHANGE ANYTIME ---
 const QUIZZES = {
   Nigeria: [
     {q:"What is the capital of Nigeria?", opts:["Abuja","Lagos"], ans:"Abuja"},
-    {q:"What is Nigeria's currency?", opts:["Naira","Cedi"], ans:"Naira"},
+    {q:"What is the currency of Nigeria?", opts:["Naira","Cedi"], ans:"Naira"},
     {q:"Which river is the longest in Nigeria?", opts:["River Niger","River Benue"], ans:"River Niger"}
   ],
   Ghana: [
     {q:"What is the capital of Ghana?", opts:["Accra","Kumasi"], ans:"Accra"},
-    {q:"What is Ghana's currency?", opts:["Cedi","Naira"], ans:"Cedi"},
+    {q:"What is the currency of Ghana?", opts:["Cedi","Naira"], ans:"Cedi"},
     {q:"Which festival is famous in Ghana?", opts:["Homowo","Durbar"], ans:"Homowo"}
   ],
   Kenya: [
     {q:"What is the capital of Kenya?", opts:["Nairobi","Mombasa"], ans:"Nairobi"},
-    {q:"What is Kenya's currency?", opts:["Shilling","Rand"], ans:"Shilling"},
+    {q:"What is the currency of Kenya?", opts:["Shilling","Rand"], ans:"Shilling"},
     {q:"Which animal is famous in Maasai Mara?", opts:["Lion","Penguin"], ans:"Lion"}
   ],
   "South Africa": [
     {q:"What is the capital of South Africa?", opts:["Pretoria","Cape Town"], ans:"Pretoria"},
-    {q:"What is South Africa's currency?", opts:["Rand","Cedi"], ans:"Rand"}
+    {q:"What is the currency of South Africa?", opts:["Rand","Cedi"], ans:"Rand"}
   ],
   Cameroon: [
     {q:"What is the capital of Cameroon?", opts:["Yaounde","Douala"], ans:"Yaounde"},
-    {q:"What is Cameroon's currency?", opts:["Central African CFA","Naira"], ans:"Central African CFA"}
+    {q:"What is the currency of Cameroon?", opts:["CFA Franc","Naira"], ans:"CFA Franc"}
   ],
   Uganda: [
     {q:"What is the capital of Uganda?", opts:["Kampala","Entebbe"], ans:"Kampala"},
-    {q:"What is Uganda's currency?", opts:["Shilling","Rand"], ans:"Shilling"}
+    {q:"What is the currency of Uganda?", opts:["Shilling","Rand"], ans:"Shilling"}
   ],
   India: [
     {q:"What is the capital of India?", opts:["New Delhi","Mumbai"], ans:"New Delhi"},
-    {q:"What is India's currency?", opts:["Rupee","Taka"], ans:"Rupee"}
+    {q:"What is the currency of India?", opts:["Rupee","Taka"], ans:"Rupee"}
   ],
   Pakistan: [
     {q:"What is the capital of Pakistan?", opts:["Islamabad","Karachi"], ans:"Islamabad"},
-    {q:"What is Pakistan's currency?", opts:["Rupee","Dinar"], ans:"Rupee"}
+    {q:"What is the currency of Pakistan?", opts:["Rupee","Dinar"], ans:"Rupee"}
   ],
   Bangladesh: [
     {q:"What is the capital of Bangladesh?", opts:["Dhaka","Chittagong"], ans:"Dhaka"},
-    {q:"What is Bangladesh's currency?", opts:["Taka","Rupee"], ans:"Taka"}
+    {q:"What is the currency of Bangladesh?", opts:["Taka","Rupee"], ans:"Taka"}
   ],
   Philippines: [
     {q:"What is the capital of Philippines?", opts:["Manila","Cebu"], ans:"Manila"},
-    {q:"What is Philippines currency?", opts:["Peso","Ringgit"], ans:"Peso"}
+    {q:"What is the currency of Philippines?", opts:["Peso","Ringgit"], ans:"Peso"}
   ],
   Indonesia: [
     {q:"What is the capital of Indonesia?", opts:["Jakarta","Bali"], ans:"Jakarta"},
-    {q:"What is Indonesia's currency?", opts:["Rupiah","Ringgit"], ans:"Rupiah"}
+    {q:"What is the currency of Indonesia?", opts:["Rupiah","Ringgit"], ans:"Rupiah"}
   ],
   USA: [
-    {q:"What is the capital of USA?", opts:["Washington D.C.","New York"], ans:"Washington D.C."},
-    {q:"What is USA currency?", opts:["Dollar","Euro"], ans:"Dollar"}
+    {q:"What is the capital of USA?", opts:["Washington","New York"], ans:"Washington"},
+    {q:"What is the currency of USA?", opts:["Dollar","Euro"], ans:"Dollar"}
   ],
   UK: [
     {q:"What is the capital of UK?", opts:["London","Manchester"], ans:"London"},
-    {q:"What is UK currency?", opts:["Pound","Euro"], ans:"Pound"}
+    {q:"What is the currency of UK?", opts:["Pound","Euro"], ans:"Pound"}
   ],
   Brazil: [
     {q:"What is the capital of Brazil?", opts:["Brasilia","Rio"], ans:"Brasilia"},
-    {q:"What is Brazil currency?", opts:["Real","Peso"], ans:"Real"}
+    {q:"What is the currency of Brazil?", opts:["Real","Peso"], ans:"Real"}
   ]
 };
 function getQuizCountry(){ return localStorage.getItem('quiz_country') || 'Nigeria'; }
@@ -342,12 +324,17 @@ function loadQuiz(){
   let q = list[dayNum % list.length];
   let qEl = document.getElementById('quizQ');
   if(qEl) qEl.textContent = q.q;
-  let optsHtml = '';
-  q.opts.forEach(o=>{
-    optsHtml += `<button class="btn btn-secondary" onclick="answerQuiz('${o}')">${o}</button>`;
-  });
   let optEl = document.getElementById('quizOptions');
-  if(optEl) optEl.innerHTML = optsHtml;
+  if(optEl){
+    optEl.innerHTML = '';
+    q.opts.forEach(function(o){
+      let b = document.createElement('button');
+      b.className = 'btn btn-secondary';
+      b.textContent = o;
+      b.onclick = function(){ answerQuiz(o); };
+      optEl.appendChild(b);
+    });
+  }
   let resEl = document.getElementById('quizResult');
   if(resEl){
     if(localStorage.getItem('quiz_done')===today){ resEl.textContent='Completed today. Come back tomorrow.'; }
@@ -359,4 +346,4 @@ function answerQuiz(ans){
   if(localStorage.getItem('quiz_done')===today){ alert('You have already completed the quiz today.'); return; }
   let q = window._currentQuiz;
   if(!q) return;
-  if(ans===q.ans){ localStorage.setItem
+  if(ans===q.ans){ localStorage.setItem('quiz_done
