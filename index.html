@@ -389,5 +389,17 @@ function withdraw(amount){
 render();
 try{ if(window.Telegram && window.Telegram.WebApp){ Telegram.WebApp.ready(); Telegram.WebApp.expand(); } }catch(e){}
 </script>
+  </script>
+
+<!-- PASTE YOUR POPUP HERE -->
+<div id="confirmPopup" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#1a1a1a; padding:20px; border-radius:20px 20px 0 0; z-index:999;">
+  <div style="text-align:center; color:#00ff88;">✓</div>
+  <p style="text-align:center; color:#00ff88; font-size:12px;">CONFIRM</p>
+  <h3 style="text-align:center; color:white;">Have you completed the task?</h3>
+  <p style="text-align:center; color:gray; font-size:13px;">Confirm honestly — fake completions can deduct your balance.</p>
+  <button id="yesBtn" style="width:100%; padding:14px; background:linear-gradient(to right, #00e5ff, #7b61ff); border:none; border-radius:12px; color:white; font-weight:bold;">Yes, I completed it</button>
+  <button onclick="closeConfirm()" style="width:100%; padding:14px; background:transparent; color:white; border:none; margin-top:10px;">Not yet</button>
+</div>
+
 </body>
 </html>
