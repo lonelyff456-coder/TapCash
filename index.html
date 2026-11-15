@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TapCash Arena</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://adsgram.ai/js/adsgram.js"></script>
+<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 <script src='//libtl.com/sdk.js' data-zone='12265858' data-sdk='show_12265858'></script>
 <style>
 *{box-sizing:border-box;font-family:Arial,sans-serif}
@@ -50,7 +50,7 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
 </div>
 <div id="earnPage" class="hidden">
   <div class="top"><div style="font-weight:800">EARN CENTER - Complete Tasks</div><div class="balance" id="balEarn">0 TAP</div><div class="sub" id="todayEarn">+0 TAP today</div></div>
-  <div class="tabs"><span class="tab">All</span><span class="tab">Main</span><span class="tab">Watch</span><span class="tab active">Ads 3</span><span class="tab">Social</span><span class="tab">Featured</span></div>
+  <div class="tabs"><span class="tab">All</span><span class="tab">Main</span><span class="tab">Watch</span><span class="tab active">Ads 2</span><span class="tab">Social</span><span class="tab">Featured</span></div>
   <div id="adCards"></div>
   <div class="box"><b>🎡 Free Spin</b><p class="small" id="spinInfo">1st Spin FREE. Next spins = Watch 1 Ad to Spin.</p><button class="btn" onclick="doSpin()">SPIN NOW</button><p class="small" id="spinResult"></p></div>
 </div>
@@ -89,9 +89,9 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
 </div>
 <script>
 const CONFIG = {
-  adsPerNetwork: 15, totalAdsPerDay: 90, resetHours: 12, tapPerAd: 5,
+  adsPerNetwork: 15, totalAdsPerDay: 30, resetHours: 12, tapPerAd: 5,
   tapForOneDollar: 1350, minWithdrawTap: 1350, minWithdrawUsd: 1.00,
-  withdrawFee: 0.05, dailyTaskAds: 45, referralReward: 200, minAdsForWithdraw: 270,
+  withdrawFee: 0.05, dailyTaskAds: 30, referralReward: 200, minAdsForWithdraw: 270,
   arenaMaxPlays: 12
 };
 let bal = parseFloat(localStorage.getItem('tap_bal')||0);
@@ -101,12 +101,12 @@ let today = new Date().toDateString();
 if(tapsDate!==today){ tapsLeft=500; localStorage.setItem('tap_date',today); }
 let adsToday = parseInt(localStorage.getItem('ads_today')||0);
 let adsTotal = parseInt(localStorage.getItem('ads_total')||0);
-let adCounts = JSON.parse(localStorage.getItem('ad_counts')||'{"Monetag":0,"Adsgram":0,"Gigapub":0}');
+let adCounts = JSON.parse(localStorage.getItem('ad_counts')||'{"Monetag":0,"Adsgram":0}');
 let spins = parseInt(localStorage.getItem('spins')||0);
 let todayEarn = parseFloat(localStorage.getItem('earn_today')||0);
 let referralEarned = parseFloat(localStorage.getItem('referral_earned')||0);
 let adsDate = localStorage.getItem('ads_date')||'';
-if(adsDate!==today){ adsToday=0; adCounts={"Monetag":0,"Adsgram":0,"Gigapub":0}; localStorage.setItem('ads_date',today); }
+if(adsDate!==today){ adsToday=0; adCounts={"Monetag":0,"Adsgram":0}; localStorage.setItem('ads_date',today); }
 let arenaState = JSON.parse(localStorage.getItem('arena_state') || '{"plays":0,"date":"","lastPick":0,"lastRoll":0,"lastResult":"","history":[]}');
 if(arenaState.date !== today){ arenaState.plays = 0; arenaState.date = today; arenaState.history = []; saveArena(); }
 function saveArena(){ localStorage.setItem('arena_state', JSON.stringify(arenaState)); }
@@ -142,7 +142,7 @@ function render(){
     if(b){ b.textContent='✅ Claimed Today - Come Back Tomorrow'; b.disabled=true; b.style.background='#333'; }
   }
   let html='';
-  [['Monetag','🔵'],['Adsgram','✈️'],['Gigapub','🟢']].forEach(([name,icon])=>{
+  [['Monetag','🔵'],['Adsgram','✈️']].forEach(([name,icon])=>{
     let c=adCounts[name]||0;
     let networkDone = c >= CONFIG.adsPerNetwork;
     let dailyDone = adsToday >= CONFIG.totalAdsPerDay;
@@ -150,7 +150,7 @@ function render(){
     let btnText = networkDone ? 'Limit Reached - Come Back in 12h' : (dailyDone ? 'Daily Limit Reached' : 'Watch');
     html+=`<div class="card"><div><h3>${icon} ${name}</h3><p>Watch a ${name} ad</p><p>${c}/${CONFIG.adsPerNetwork} ads • resets 12h after the first</p></div><div style="text-align:right"><div class="badge">+${CONFIG.tapPerAd} TAP</div><br><br><button class="watch" ${disabled} onclick="watchAd('${name}')"> ${btnText}</button></div></div>`;
   });
-  html+=`<div style="padding:0 14px" class="small">Ads watched today: ${adsToday}/${CONFIG.totalAdsPerDay} paid (90 per day). Total ads watched: ${adsTotal}. Daily Task: ${adsToday}/${CONFIG.dailyTaskAds} ads. You need ${CONFIG.minAdsForWithdraw} total ads before your first withdrawal.</div>`;
+  html+=`<div style="padding:0 14px" class="small">Ads watched today: ${adsToday}/${CONFIG.totalAdsPerDay} paid (30 per day - 15 Monetag + 15 Adsgram). Total ads watched: ${adsTotal}. Daily Task: ${adsToday}/${CONFIG.dailyTaskAds} ads. You need ${CONFIG.minAdsForWithdraw} total ads before your first withdrawal.</div>`;
   document.getElementById('adCards').innerHTML=html;
   document.getElementById('spinInfo').textContent = spins==0 ? '1st Spin FREE - tap SPIN NOW' : 'Next spins = Watch 1 Ad to Spin. Spins used: '+spins;
   restoreArena();
@@ -173,10 +173,9 @@ function watchAd(name){
   }
   if(name==='Adsgram'){
     if(!AdController){ alert('Adsgram not loaded. Check internet and try again.'); return; }
-    AdController.show().then(()=>{ adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++; add(CONFIG.tapPerAd); alert('You earned +'+CONFIG.tapPerAd+' TAP from Adsgram'); }).catch(()=>{ alert('Watch the full ad to get +'+CONFIG.tapPerAd+' TAP'); });
+    AdController.show().then((result)=>{ if(result && result.done){ adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++; add(CONFIG.tapPerAd); alert('You earned +'+CONFIG.tapPerAd+' TAP from Adsgram'); } }).catch(()=>{ alert('Watch the full ad to get +'+CONFIG.tapPerAd+' TAP'); });
     return;
   }
-  adCounts[name]=(adCounts[name]||0)+1; adsToday++; adsTotal++; add(CONFIG.tapPerAd); alert('You earned +'+CONFIG.tapPerAd+' TAP from '+name);
 }
 function doSpin(){
   if(spins>0){ adsToday++; adsTotal++; }
@@ -229,4 +228,4 @@ restoreArena();
 if(window.Telegram?.WebApp) Telegram.WebApp.ready();
 </script>
 </body>
-  </html>
+    </html>
