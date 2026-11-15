@@ -118,3 +118,139 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #333;ba
   <div onclick="show('friendsPage',this)">👥<br>Friends</div>
   <div onclick="show('walletPage',this)">💰<br>Wallet</div>
     </div>
+<script>
+var CONFIG = {
+  tapForOneDollar: 2000,
+  tapPerAd: 5,
+  checkinRewards: [50, 60, 70, 80, 90, 100, 150],
+  arenaMaxPlays: 8,
+  minWithdrawUsd: 1,
+  maxWithdrawUsdPerDay: 3,
+  withdrawFee: 0,
+  referralPercent: 20,
+  adsPlan: { Monetag: 15, Adsgram: 15, OnClickA: 10, Shortlink1: 10, Shortlink2: 10, Shortlink3: 10, Shortlink4: 10 },
+  shortlinks: {
+    Shortlink1: "https://shrinkme.io/your-link-1",
+    Shortlink2: "https://shrinkme.io/your-link-2",
+    Shortlink3: "https://shrinkme.io/your-link-3",
+    Shortlink4: "https://shrinkme.io/your-link-4"
+  },
+  totalAdsPerDay: 80
+};
+var bal = parseFloat(localStorage.getItem('tap_bal')||0);
+var tapsLeft = parseInt(localStorage.getItem('tap_left')||500);
+var today = new Date().toDateString();
+var tapsDate = localStorage.getItem('tap_date')||'';
+if(tapsDate!==today){ tapsLeft=500; localStorage.setItem('tap_date',today); }
+var adsToday = parseInt(localStorage.getItem('ads_today')||0);
+var adCounts = JSON.parse(localStorage.getItem('ad_counts')||'{"Monetag":0,"Adsgram":0,"OnClickA":0,"Shortlink1":0,"Shortlink2":0,"Shortlink3":0,"Shortlink4":0}');
+var spins = parseInt(localStorage.getItem('spins')||0);
+var todayEarn = parseFloat(localStorage.getItem('earn_today')||0);
+var referralEarned = parseFloat(localStorage.getItem('referral_earned')||0);
+var adsDate = localStorage.getItem('ads_date')||'';
+if(adsDate!==today){ adsToday=0; adCounts={"Monetag":0,"Adsgram":0,"OnClickA":0,"Shortlink1":0,"Shortlink2":0,"Shortlink3":0,"Shortlink4":0}; localStorage.setItem('ads_date',today); }
+var checkinDay = parseInt(localStorage.getItem('checkin_day')||0);
+var withdrawnToday = parseFloat(localStorage.getItem('withdrawn_today')||0);
+var withdrawnDate = localStorage.getItem('withdrawn_date')||'';
+if(withdrawnDate!==today){ withdrawnToday=0; localStorage.setItem('withdrawn_date',today); }
+var arenaState = JSON.parse(localStorage.getItem('arena_state') || '{"plays":0,"date":""}');
+if(arenaState.date !== today){ arenaState.plays=0; arenaState.date=today; }
+function saveArena(){ try{ localStorage.setItem('arena_state', JSON.stringify(arenaState)); }catch(e){} }
+saveArena();
+var AdController = null;
+try{ if(window.Adsgram){ AdController = window.Adsgram.init({ blockId: "59790" }); } }catch(e){ AdController = null; }
+function save(){ try{ localStorage.setItem('tap_bal',bal); localStorage.setItem('tap_left',tapsLeft); localStorage.setItem('ads_today',adsToday); localStorage.setItem('ad_counts',JSON.stringify(adCounts)); localStorage.setItem('spins',spins); localStorage.setItem('earn_today',todayEarn); localStorage.setItem('referral_earned',referralEarned); localStorage.setItem('withdrawn_today',withdrawnToday); }catch(e){} render(); }
+function add(n){ bal+=n; todayEarn+=n; save(); }
+function usdValue(tap){ return tap / CONFIG.tapForOneDollar; }
+function render(){
+  try{
+  var els = document.querySelectorAll('#balTop,#balEarn,#balWallet');
+  for(var i=0;i<els.length;i++){ els[i].textContent=bal.toFixed(0)+' TAP'; }
+  var usds = document.querySelectorAll('#usdTop,#usdWallet');
+  for(var j=0;j<usds.length;j++){ usds[j].textContent='$'+usdValue(bal).toFixed(2); }
+  var tods = document.querySelectorAll('#todayTop,#todayEarn');
+  for(var k=0;k<tods.length;k++){ tods[k].textContent='+'+todayEarn.toFixed(0)+' TAP today'; }
+  document.getElementById('tapLeft').textContent=tapsLeft+' taps left today';
+  var pct = Math.min(100, (adsToday / CONFIG.totalAdsPerDay) * 100);
+  document.getElementById('dailyTaskBar').style.width = pct + '%';
+  document.getElementById('dailyTaskCount').textContent = adsToday + ' / ' + CONFIG.totalAdsPerDay + ' ads';
+  document.getElementById('refInfo').textContent = 'You have earned ' + referralEarned.toFixed(0) + ' TAP from referrals. You earn 20% of your friends earnings.';
+  var nextReward = CONFIG.checkinRewards[Math.min(checkinDay,6)];
+  document.getElementById('checkinText').textContent = 'Claim your daily reward.';
+  var lastCheckin = localStorage.getItem('last_checkin')||'';
+  var b=document.getElementById('checkinBtn');
+  if(b){
+    if(lastCheckin===today){ b.textContent='Claimed Today - Come Back Tomorrow'; b.disabled=true; b.style.background='#333'; }
+    else { b.textContent='Claim +'+nextReward+' TAP'; b.disabled=false; b.style.background='#2563eb'; }
+  }
+  var icons = {Monetag:'🔵',Adsgram:'✈️',OnClickA:'🟢',Shortlink1:'🔗',Shortlink2:'🔗',Shortlink3:'🔗',Shortlink4:'🔗'};
+  var labels = {Monetag:'Monetag',Adsgram:'Adsgram',OnClickA:'OnClickA',Shortlink1:'Shortlink 1',Shortlink2:'Shortlink 2',Shortlink3:'Shortlink 3',Shortlink4:'Shortlink 4'};
+  var html='';
+  Object.keys(CONFIG.adsPlan).forEach(function(name){
+    var c=adCounts[name]||0;
+    var total=CONFIG.adsPlan[name];
+    var done = c>=total;
+    var disabled = done ? 'disabled' : '';
+    var btnText = done ? 'Completed' : 'Watch';
+    var sub = name.indexOf('Shortlink')===0 ? 'Complete 1 page' : 'Watch 1 ad';
+    html+='<div class="card"><div><h3>'+icons[name]+' '+labels[name]+'</h3><p>'+sub+'</p><p>'+c+'/'+total+'</p></div><div style="text-align:right"><div class="badge">+'+CONFIG.tapPerAd+' TAP</div><br><br><button class="watch" '+disabled+' onclick="watchAd(\''+name+'\')"> '+btnText+'</button></div></div>';
+  });
+  document.getElementById('adCards').innerHTML=html;
+  document.getElementById('spinInfo').textContent = spins==0 ? '1st Spin FREE - tap SPIN NOW' : 'Next spins = Watch 1 Ad to Spin. Spins used: '+spins;
+  document.getElementById('arenaPlaysText').textContent = 'Plays used today: ' + arenaState.plays + ' / ' + CONFIG.arenaMaxPlays;
+  loadQuiz();
+  }catch(e){}
+}
+function show(id,el){
+  ['homePage','earnPage','arenaPage','friendsPage','walletPage'].forEach(function(p){ document.getElementById(p).classList.add('hidden'); });
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.nav div').forEach(function(d){ d.classList.remove('active'); }); if(el) el.classList.add('active'); window.scrollTo(0,0);
+}
+function doTap(){
+  if(tapsLeft<=0){ alert('You have finished your taps for today. Come back tomorrow.'); return; }
+  tapsLeft--; add(0.1);
+}
+function watchAd(name){
+  if(name==='Monetag'){
+    if(typeof show_12265858 !== 'function'){ alert('No ad available right now. Please try again.'); return; }
+    show_12265858().then(function(){ completeAd(name); }).catch(function(){ alert('Please watch the full ad to earn your reward.'); });
+    return;
+  }
+  if(name==='Adsgram'){
+    if(!AdController){ alert('No ad available right now. Please try again.'); return; }
+    AdController.show().then(function(result){ if(result && result.done){ completeAd(name); } }).catch(function(){ alert('Please watch the full ad to earn your reward.'); });
+    return;
+  }
+  if(name==='OnClickA'){
+    if(typeof show_12265858 === 'function'){
+      show_12265858().then(function(){ completeAd(name); }).catch(function(){ alert('No ad available right now. Please try again.'); });
+    } else { alert('No ad available right now. Please try again.'); }
+    return;
+  }
+  if(name.indexOf('Shortlink')===0){
+    window.open(CONFIG.shortlinks[name], '_blank');
+    setTimeout(function(){ if(confirm('Did you complete this page? Tap OK to claim +5 TAP.')){ completeAd(name); } }, 2000);
+    return;
+  }
+}
+function completeAd(name){
+  adCounts[name]=(adCounts[name]||0)+1; adsToday++; add(CONFIG.tapPerAd);
+  alert('You earned +'+CONFIG.tapPerAd+' TAP');
+}
+function doSpin(){
+  if(spins>0){ alert('Please watch 1 ad first to spin again.'); return; }
+  spins++;
+  var r=Math.random()*100, win=5;
+  if(r<70) win=5; else if(r<90) win=10; else if(r<99) win=15; else win=50;
+  add(win);
+  document.getElementById('spinResult').textContent='You won +'+win+' TAP!';
+}
+function checkin(){
+  var last = localStorage.getItem('last_checkin')||'';
+  if(last===today){ alert('You have already claimed your check-in today.'); return; }
+  var reward = CONFIG.checkinRewards[Math.min(checkinDay,6)];
+  localStorage.setItem('last_checkin', today);
+  checkinDay++; localStorage.setItem('checkin_day', checkinDay);
+  add(reward); alert('Daily Check-in +'+reward+' TAP');
+}
+                          </script>
