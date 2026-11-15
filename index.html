@@ -31,7 +31,7 @@ body{margin:0;background:#0a0a0a;color:#fff;padding-bottom:80px}
 .nav div{text-align:center;font-size:12px;color:#888;cursor:pointer}
 .nav div.active{color:#2563eb}
 .hidden{display:none}
-input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;background:#111;color:#fff;margin-top:8px}
+input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #333;background:#111;color:#fff;margin-top:8px}
 .progress{background:#333;height:8px;border-radius:10px;margin-top:8px;overflow:hidden}
 .progress div{background:#22c55e;height:100%;width:0%}
 .game-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
@@ -55,9 +55,26 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
   <div class="top"><div style="font-weight:800">EARN CENTER</div><div class="balance" id="balEarn">0 TAP</div><div class="sub" id="todayEarn">+0 TAP today</div></div>
   <div id="adCards"></div>
   <div class="box"><b>🎡 Free Spin</b><p class="small" id="spinInfo">1st Spin FREE. Next spins = Watch 1 Ad to Spin.</p><button class="btn" onclick="doSpin()">SPIN NOW</button><p class="small" id="spinResult"></p></div>
-  <div class="box"><b>🧩 Daily Quiz</b><p class="small" id="quizQ">What is the capital of Nigeria?</p>
-    <button class="btn btn-secondary" onclick="answerQuiz('Abuja')">Abuja</button>
-    <button class="btn btn-secondary" onclick="answerQuiz('Lagos')">Lagos</button>
+  <div class="box"><b>🧩 Daily Quiz</b>
+    <p class="small">Choose your country. Your choice will be saved. You can change it anytime.</p>
+    <select id="quizCountry" onchange="changeCountry()">
+      <option value="Nigeria">Nigeria</option>
+      <option value="Ghana">Ghana</option>
+      <option value="Kenya">Kenya</option>
+      <option value="South Africa">South Africa</option>
+      <option value="Cameroon">Cameroon</option>
+      <option value="Uganda">Uganda</option>
+      <option value="India">India</option>
+      <option value="Pakistan">Pakistan</option>
+      <option value="Bangladesh">Bangladesh</option>
+      <option value="Philippines">Philippines</option>
+      <option value="Indonesia">Indonesia</option>
+      <option value="USA">USA</option>
+      <option value="UK">UK</option>
+      <option value="Brazil">Brazil</option>
+    </select>
+    <p class="small" id="quizQ" style="margin-top:12px;color:#fff;font-size:15px">Loading question...</p>
+    <div id="quizOptions"></div>
     <p class="small" id="quizResult"></p>
   </div>
 </div>
@@ -90,7 +107,7 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
   <div class="box"><b>Referral Earnings</b><p class="small" id="refInfo">You have earned 0 TAP from referrals.</p></div>
 </div>
 
-<!-- WALLET - NO CALCULATIONS, ONLY BALANCE -->
+<!-- WALLET -->
 <div id="walletPage" class="hidden">
   <div class="top"><h2>WALLET</h2><div class="balance" id="balWallet">0 TAP</div><div class="usd" id="usdWallet">$0.00</div></div>
   <div class="box"><b>Withdraw</b><p class="small">USDT (BEP20) on BNB Smart Chain only.</p>
@@ -115,26 +132,15 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;backgroun
 
 <script>
 const CONFIG = {
-  tapForOneDollar: 2000, // 2000 TAP = $1 - FOREVER
+  tapForOneDollar: 2000,
   tapPerAd: 5,
-  tapPerShortlinkPage: 5,
   checkinRewards: [50, 60, 70, 80, 90, 100, 150],
   arenaMaxPlays: 8,
   minWithdrawUsd: 1,
   maxWithdrawUsdPerDay: 3,
   withdrawFee: 0,
   referralPercent: 20,
-  // 80 ads total: Monetag 15 + Adsgram 15 + OnClickA 10 + Shortlink 40
-  adsPlan: {
-    Monetag: 15,
-    Adsgram: 15,
-    OnClickA: 10,
-    Shortlink1: 10,
-    Shortlink2: 10,
-    Shortlink3: 10,
-    Shortlink4: 10
-  },
-  // REPLACE THESE WITH YOUR REAL SHORTLINKS
+  adsPlan: { Monetag: 15, Adsgram: 15, OnClickA: 10, Shortlink1: 10, Shortlink2: 10, Shortlink3: 10, Shortlink4: 10 },
   shortlinks: {
     Shortlink1: "https://shrinkme.io/your-link-1",
     Shortlink2: "https://shrinkme.io/your-link-2",
@@ -156,7 +162,6 @@ let todayEarn = parseFloat(localStorage.getItem('earn_today')||0);
 let referralEarned = parseFloat(localStorage.getItem('referral_earned')||0);
 let adsDate = localStorage.getItem('ads_date')||'';
 if(adsDate!==today){ adsToday=0; adCounts={"Monetag":0,"Adsgram":0,"OnClickA":0,"Shortlink1":0,"Shortlink2":0,"Shortlink3":0,"Shortlink4":0}; localStorage.setItem('ads_date',today); }
-let quizDone = localStorage.getItem('quiz_done')===today;
 let checkinDay = parseInt(localStorage.getItem('checkin_day')||0);
 let withdrawnToday = parseFloat(localStorage.getItem('withdrawn_today')||0);
 let withdrawnDate = localStorage.getItem('withdrawn_date')||'';
@@ -179,7 +184,6 @@ function render(){
   document.getElementById('dailyTaskBar').style.width = pct + '%';
   document.getElementById('dailyTaskCount').textContent = adsToday + ' / ' + CONFIG.totalAdsPerDay + ' ads';
   document.getElementById('refInfo').textContent = 'You have earned ' + referralEarned.toFixed(0) + ' TAP from referrals. You earn 20% of your friends earnings.';
-  // Check-in text - no calculation, just next reward
   let nextReward = CONFIG.checkinRewards[Math.min(checkinDay,6)];
   document.getElementById('checkinText').textContent = 'Claim your daily reward.';
   let lastCheckin = localStorage.getItem('last_checkin')||'';
@@ -190,7 +194,6 @@ function render(){
     let b=document.getElementById('checkinBtn');
     if(b){ b.textContent='Claim +'+nextReward+' TAP'; b.disabled=false; b.style.background='#2563eb'; }
   }
-  // Build 7 ad cards
   let icons = {Monetag:'🔵',Adsgram:'✈️',OnClickA:'🟢',Shortlink1:'🔗',Shortlink2:'🔗',Shortlink3:'🔗',Shortlink4:'🔗'};
   let labels = {Monetag:'Monetag',Adsgram:'Adsgram',OnClickA:'OnClickA',Shortlink1:'Shortlink 1',Shortlink2:'Shortlink 2',Shortlink3:'Shortlink 3',Shortlink4:'Shortlink 4'};
   let html='';
@@ -206,7 +209,7 @@ function render(){
   document.getElementById('adCards').innerHTML=html;
   document.getElementById('spinInfo').textContent = spins==0 ? '1st Spin FREE - tap SPIN NOW' : 'Next spins = Watch 1 Ad to Spin. Spins used: '+spins;
   document.getElementById('arenaPlaysText').textContent = 'Plays used today: ' + arenaState.plays + ' / ' + CONFIG.arenaMaxPlays;
-  if(quizDone){ document.getElementById('quizResult').textContent='Completed today. Come back tomorrow.'; }
+  loadQuiz();
 }
 
 function show(id,el){
@@ -218,8 +221,6 @@ function doTap(){
   if(tapsLeft<=0){ alert('You have finished your taps for today. Come back tomorrow.'); return; }
   tapsLeft--; add(0.1);
 }
-
-// --- ADS ---
 function watchAd(name){
   if(name==='Monetag'){
     if(typeof show_12265858 !== 'function'){ alert('No ad available right now. Please try again.'); return; }
@@ -232,16 +233,13 @@ function watchAd(name){
     return;
   }
   if(name==='OnClickA'){
-    // REPLACE with your real OnClickA rewarded code. Fallback = try Monetag again so user never sees error
     if(typeof show_12265858 === 'function'){
       show_12265858().then(()=>{ completeAd(name); }).catch(()=>{ alert('No ad available right now. Please try again.'); });
     } else { alert('No ad available right now. Please try again.'); }
     return;
   }
   if(name.startsWith('Shortlink')){
-    // Open shortlink - user completes 1 page = +5 TAP. Progress is saved.
     window.open(CONFIG.shortlinks[name], '_blank');
-    // Give reward after user returns - simple and clear, no error
     setTimeout(()=>{ if(confirm('Did you complete this page? Tap OK to claim +5 TAP.')){ completeAd(name); } }, 2000);
     return;
   }
@@ -250,8 +248,6 @@ function completeAd(name){
   adCounts[name]=(adCounts[name]||0)+1; adsToday++; add(CONFIG.tapPerAd);
   alert('You earned +'+CONFIG.tapPerAd+' TAP');
 }
-
-// --- SPIN / CHECKIN / QUIZ ---
 function doSpin(){
   if(spins>0){ alert('Please watch 1 ad first to spin again.'); return; }
   spins++;
@@ -268,47 +264,99 @@ function checkin(){
   checkinDay++; localStorage.setItem('checkin_day', checkinDay);
   add(reward); alert('Daily Check-in +'+reward+' TAP');
 }
+
+// --- QUIZ BY COUNTRY - PERMANENT, CAN CHANGE ANYTIME ---
+const QUIZZES = {
+  Nigeria: [
+    {q:"What is the capital of Nigeria?", opts:["Abuja","Lagos"], ans:"Abuja"},
+    {q:"What is Nigeria's currency?", opts:["Naira","Cedi"], ans:"Naira"},
+    {q:"Which river is the longest in Nigeria?", opts:["River Niger","River Benue"], ans:"River Niger"}
+  ],
+  Ghana: [
+    {q:"What is the capital of Ghana?", opts:["Accra","Kumasi"], ans:"Accra"},
+    {q:"What is Ghana's currency?", opts:["Cedi","Naira"], ans:"Cedi"},
+    {q:"Which festival is famous in Ghana?", opts:["Homowo","Durbar"], ans:"Homowo"}
+  ],
+  Kenya: [
+    {q:"What is the capital of Kenya?", opts:["Nairobi","Mombasa"], ans:"Nairobi"},
+    {q:"What is Kenya's currency?", opts:["Shilling","Rand"], ans:"Shilling"},
+    {q:"Which animal is famous in Maasai Mara?", opts:["Lion","Penguin"], ans:"Lion"}
+  ],
+  "South Africa": [
+    {q:"What is the capital of South Africa?", opts:["Pretoria","Cape Town"], ans:"Pretoria"},
+    {q:"What is South Africa's currency?", opts:["Rand","Cedi"], ans:"Rand"}
+  ],
+  Cameroon: [
+    {q:"What is the capital of Cameroon?", opts:["Yaounde","Douala"], ans:"Yaounde"},
+    {q:"What is Cameroon's currency?", opts:["Central African CFA","Naira"], ans:"Central African CFA"}
+  ],
+  Uganda: [
+    {q:"What is the capital of Uganda?", opts:["Kampala","Entebbe"], ans:"Kampala"},
+    {q:"What is Uganda's currency?", opts:["Shilling","Rand"], ans:"Shilling"}
+  ],
+  India: [
+    {q:"What is the capital of India?", opts:["New Delhi","Mumbai"], ans:"New Delhi"},
+    {q:"What is India's currency?", opts:["Rupee","Taka"], ans:"Rupee"}
+  ],
+  Pakistan: [
+    {q:"What is the capital of Pakistan?", opts:["Islamabad","Karachi"], ans:"Islamabad"},
+    {q:"What is Pakistan's currency?", opts:["Rupee","Dinar"], ans:"Rupee"}
+  ],
+  Bangladesh: [
+    {q:"What is the capital of Bangladesh?", opts:["Dhaka","Chittagong"], ans:"Dhaka"},
+    {q:"What is Bangladesh's currency?", opts:["Taka","Rupee"], ans:"Taka"}
+  ],
+  Philippines: [
+    {q:"What is the capital of Philippines?", opts:["Manila","Cebu"], ans:"Manila"},
+    {q:"What is Philippines currency?", opts:["Peso","Ringgit"], ans:"Peso"}
+  ],
+  Indonesia: [
+    {q:"What is the capital of Indonesia?", opts:["Jakarta","Bali"], ans:"Jakarta"},
+    {q:"What is Indonesia's currency?", opts:["Rupiah","Ringgit"], ans:"Rupiah"}
+  ],
+  USA: [
+    {q:"What is the capital of USA?", opts:["Washington D.C.","New York"], ans:"Washington D.C."},
+    {q:"What is USA currency?", opts:["Dollar","Euro"], ans:"Dollar"}
+  ],
+  UK: [
+    {q:"What is the capital of UK?", opts:["London","Manchester"], ans:"London"},
+    {q:"What is UK currency?", opts:["Pound","Euro"], ans:"Pound"}
+  ],
+  Brazil: [
+    {q:"What is the capital of Brazil?", opts:["Brasilia","Rio"], ans:"Brasilia"},
+    {q:"What is Brazil currency?", opts:["Real","Peso"], ans:"Real"}
+  ]
+};
+function getQuizCountry(){ return localStorage.getItem('quiz_country') || 'Nigeria'; }
+function changeCountry(){
+  let c = document.getElementById('quizCountry').value;
+  localStorage.setItem('quiz_country', c);
+  loadQuiz();
+}
+function loadQuiz(){
+  let country = getQuizCountry();
+  let sel = document.getElementById('quizCountry');
+  if(sel) sel.value = country;
+  let list = QUIZZES[country] || QUIZZES['Nigeria'];
+  let dayNum = new Date().getDate();
+  let q = list[dayNum % list.length];
+  let qEl = document.getElementById('quizQ');
+  if(qEl) qEl.textContent = q.q;
+  let optsHtml = '';
+  q.opts.forEach(o=>{
+    optsHtml += `<button class="btn btn-secondary" onclick="answerQuiz('${o}')">${o}</button>`;
+  });
+  let optEl = document.getElementById('quizOptions');
+  if(optEl) optEl.innerHTML = optsHtml;
+  let resEl = document.getElementById('quizResult');
+  if(resEl){
+    if(localStorage.getItem('quiz_done')===today){ resEl.textContent='Completed today. Come back tomorrow.'; }
+    else { resEl.textContent=''; }
+  }
+  window._currentQuiz = q;
+}
 function answerQuiz(ans){
-  if(quizDone){ alert('You have already completed the quiz today.'); return; }
-  if(ans==='Abuja'){ localStorage.setItem('quiz_done',today); quizDone=true; add(50); document.getElementById('quizResult').textContent='Correct! +50 TAP'; }
-  else { document.getElementById('quizResult').textContent='Wrong answer. Try again tomorrow.'; }
-}
-
-// --- GAMES - 8 PLAYS TOTAL ---
-function playDice(g){
-  if(arenaState.plays >= CONFIG.arenaMaxPlays){ alert('You have used all your plays for today. Come back tomorrow.'); return; }
-  let roll=Math.floor(Math.random()*6)+1;
-  arenaState.plays++; saveArena();
-  if(g==roll){ add(10); document.getElementById('diceResult').textContent='You won! You picked '+g+', roll was '+roll+' +10 TAP'; }
-  else { document.getElementById('diceResult').textContent='You picked '+g+', roll was '+roll+'. Try again!'; }
-  render();
-}
-function playSimpleGame(name){
-  if(arenaState.plays >= CONFIG.arenaMaxPlays){ alert('You have used all your plays for today. Come back tomorrow.'); return; }
-  arenaState.plays++; saveArena();
-  let win = Math.floor(Math.random()*30)+10;
-  add(win);
-  document.getElementById('gameResult').textContent=name+' finished! You earned +'+win+' TAP';
-  render();
-}
-
-function copyRef(){ navigator.clipboard.writeText(document.getElementById('refLink').value); alert('Link copied!'); }
-
-// --- WITHDRAW - USDT BEP20, NO FEE, MIN $1 MAX $3/DAY, NO CALCULATIONS SHOWN ---
-function withdraw(amount){
-  let needTap = amount * CONFIG.tapForOneDollar;
-  if(amount < CONFIG.minWithdrawUsd){ alert('Minimum withdrawal is $1.'); return; }
-  if(withdrawnToday + amount > CONFIG.maxWithdrawUsdPerDay){ alert('Daily limit is $3 per day. You have already withdrawn $'+withdrawnToday+' today.'); return; }
-  if(bal < needTap){ alert('Not enough balance. You need '+needTap+' TAP for $'+amount+'.'); return; }
-  let addr = document.getElementById('walletAddr').value.trim();
-  if(!addr){ alert('Please enter your USDT BEP20 wallet address.'); return; }
-  if(!addr.startsWith('0x') || addr.length < 20){ alert('Invalid address. Your USDT BEP20 address must start with 0x.'); return; }
-  bal -= needTap; withdrawnToday += amount; save();
-  document.getElementById('wdMsg').textContent='Withdrawal request sent! $'+amount+' USDT (BEP20) will arrive within 24 hours to '+addr+'.';
-}
-
-render();
-if(window.Telegram?.WebApp) Telegram.WebApp.ready();
-</script>
-</body>
-      </html>
+  if(localStorage.getItem('quiz_done')===today){ alert('You have already completed the quiz today.'); return; }
+  let q = window._currentQuiz;
+  if(!q) return;
+  if(ans===q.ans){ localStorage.setItem
