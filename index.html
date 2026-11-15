@@ -388,8 +388,48 @@ function withdraw(amount){
 }
 render();
 try{ if(window.Telegram && window.Telegram.WebApp){ Telegram.WebApp.ready(); Telegram.WebApp.expand(); } }catch(e){}
+  function startTask(taskId, link) {
+  const startTime = Date.now();
+  window.open(link, '_blank');
+  setTimeout(() => {
+    showConfirmPopup(taskId, startTime);
+  }, 1000);
+}
+
+function showConfirmPopup(taskId, startTime) {
+  document.getElementById('confirmPopup').style.display = 'block';
+  const yesBtn = document.getElementById('yesBtn');
+  yesBtn.disabled = true;
+  yesBtn.innerText = "Wait 15s...";
+  let countdown = 15;
+  let timer = setInterval(() => {
+    countdown--;
+    yesBtn.innerText = "Wait " + countdown + "s...";
+    if (countdown <= 0) {
+      clearInterval(timer);
+      yesBtn.disabled = false;
+      yesBtn.innerText = "Yes, I completed it";
+    }
+  }, 1000);
+  yesBtn.onclick = () => {
+    const timeSpent = (Date.now() - startTime) / 1000;
+    if (timeSpent < 15) {
+      alert("You never complete am, go do am well!");
+      return;
+    }
+    giveReward(taskId, 5);
+    document.getElementById('confirmPopup').style.display = 'none';
+  };
+}
+  function closeConfirm() {
+  document.getElementById('confirmPopup').style.display = 'none';
+}
+
+function giveReward(taskId, amount) {
+  add(amount);
+  alert("You don complete task! +" + amount + " taps");
+}                                                                 }
 </script>
-  </script>
 
 <!-- PASTE YOUR POPUP HERE -->
 <div id="confirmPopup" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#1a1a1a; padding:20px; border-radius:20px 20px 0 0; z-index:999;">
