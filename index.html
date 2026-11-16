@@ -214,6 +214,10 @@ function doTap(){
   if(tapsLeft<=0){ alert('You have finished your taps for today. Come back tomorrow.'); return; }
   tapsLeft--; add(0.1);
 }
+  function startTask(name, url){
+  window.open(url, '_blank');
+  completeAd(name);
+  }
 function watchAd(name){
   if(name==='Monetag'){
     if(typeof show_12265858 !== 'function'){ alert('No ad available right now. Please try again.'); return; }
