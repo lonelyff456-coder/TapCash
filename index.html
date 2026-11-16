@@ -416,23 +416,24 @@ function showConfirmPopup(taskId, startTime) {
     }
   }, 1000);
   yesBtn.onclick = () => {
-    const timeSpent = (Date.now() - startTime) / 1000;
-    if (timeSpent < 15) {
-      alert("You never complete am, go do am well!");
-      return;
-    }
-    giveReward(taskId, 5);
-    document.getElementById('confirmPopup').style.display = 'none';
-  };
+  const timeSpent = (Date.now() - startTime) / 1000;
+  if (timeSpent < 15) {
+    alert("You have not completed it yet, please wait 15 seconds");
+    return;
+  }
+  giveReward(taskId, 5);
+  document.getElementById('confirmPopup').style.display = 'none';
+};
 }
-  function closeConfirm() {
+
+function closeConfirm() {
   document.getElementById('confirmPopup').style.display = 'none';
 }
 
 function giveReward(taskId, amount) {
   add(amount);
-  alert("You don complete task! +" + amount + " taps");
-}                                                                 }
+  alert("You have completed the task! " + amount + " taps");
+}
 loadQuiz();
 </script>
 
