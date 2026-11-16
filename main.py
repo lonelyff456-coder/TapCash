@@ -48,8 +48,6 @@ def start(message):
     name = message.from_user.first_name
     text = f"Welcome {name} to TapCash Arena! 🎮\n\n"
     text += "Tap to earn, watch ads, play Arena and withdraw USDT BNB.\n\n"
-    text += "Min withdraw: $1.00 (1,350 TAP)\n"
-    text += "Fee: $0.05 - You receive $0.95\n\n"
     text += "Press PLAY below to open the app 👇"
     bot.send_message(message.chat.id, text, reply_markup=main_menu())
 
