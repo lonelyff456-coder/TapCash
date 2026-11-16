@@ -128,7 +128,7 @@ var CONFIG = {
   maxWithdrawUsdPerDay: 3,
   withdrawFee: 0,
   referralPercent: 20,
-  adsPlan: { Monetag: 15, Adsgram: 15, OnClickA: 10, Shortlink1: 10, Shortlink2: 10, Shortlink3: 10, Shortlink4: 10 },
+  adsPlan: { Monetag: 15, Adsgram: 15, OnClickA: 10, Shortlink1: 02, Shortlink2: 02, Shortlink3: 02, Shortlink4: 02 },
       shortlinks: {
       Shortlink1: "https://shrinkme.click/aLAY",
       Shortlink2: "https://shrinkme.click/Qu5Lzg",
@@ -259,102 +259,249 @@ function checkin(){
 }
                           </script>
 <script>
-var QUIZZES = {
-  Nigeria: [
-    {q:"What is the capital of Nigeria?", opts:["Abuja","Lagos"], ans:"Abuja"},
-    {q:"What is the currency of Nigeria?", opts:["Naira","Cedi"], ans:"Naira"},
-    {q:"Which river is the longest in Nigeria?", opts:["River Niger","River Benue"], ans:"River Niger"}
-  ],
-  Ghana: [
-    {q:"What is the capital of Ghana?", opts:["Accra","Kumasi"], ans:"Accra"},
-    {q:"What is the currency of Ghana?", opts:["Cedi","Naira"], ans:"Cedi"},
-    {q:"Which festival is famous in Ghana?", opts:["Homowo","Durbar"], ans:"Homowo"}
-  ],
-  Kenya: [
-    {q:"What is the capital of Kenya?", opts:["Nairobi","Mombasa"], ans:"Nairobi"},
-    {q:"What is the currency of Kenya?", opts:["Shilling","Rand"], ans:"Shilling"},
-    {q:"Which animal is famous in Maasai Mara?", opts:["Lion","Penguin"], ans:"Lion"}
-  ],
-  "South Africa": [
-    {q:"What is the capital of South Africa?", opts:["Pretoria","Cape Town"], ans:"Pretoria"},
-    {q:"What is the currency of South Africa?", opts:["Rand","Cedi"], ans:"Rand"}
-  ],
-  Cameroon: [
-    {q:"What is the capital of Cameroon?", opts:["Yaounde","Douala"], ans:"Yaounde"},
-    {q:"What is the currency of Cameroon?", opts:["CFA Franc","Naira"], ans:"CFA Franc"}
-  ],
-  Uganda: [
-    {q:"What is the capital of Uganda?", opts:["Kampala","Entebbe"], ans:"Kampala"},
-    {q:"What is the currency of Uganda?", opts:["Shilling","Rand"], ans:"Shilling"}
-  ],
-  India: [
-    {q:"What is the capital of India?", opts:["New Delhi","Mumbai"], ans:"New Delhi"},
-    {q:"What is the currency of India?", opts:["Rupee","Taka"], ans:"Rupee"}
-  ],
-  Pakistan: [
-    {q:"What is the capital of Pakistan?", opts:["Islamabad","Karachi"], ans:"Islamabad"},
-    {q:"What is the currency of Pakistan?", opts:["Rupee","Dinar"], ans:"Rupee"}
-  ],
-  Bangladesh: [
-    {q:"What is the capital of Bangladesh?", opts:["Dhaka","Chittagong"], ans:"Dhaka"},
-    {q:"What is the currency of Bangladesh?", opts:["Taka","Rupee"], ans:"Taka"}
-  ],
+const QUIZZES = {
   Philippines: [
-    {q:"What is the capital of Philippines?", opts:["Manila","Cebu"], ans:"Manila"},
-    {q:"What is the currency of Philippines?", opts:["Peso","Ringgit"], ans:"Peso"}
+    { q: "What is the capital of Philippines?", opts: ["Manila", "Cebu", "Davao", "Quezon"], answer: "Manila" },
+    { q: "What is the currency of Philippines?", opts: ["Peso", "Rupee", "Baht", "Ringgit"], answer: "Peso" },
+    { q: "What is the national dish of Philippines?", opts: ["Adobo", "Sushi", "Pizza", "Burger"], answer: "Adobo" },
+    { q: "Which ocean is Philippines in?", opts: ["Atlantic", "Pacific", "Indian", "Arctic"], answer: "Pacific" },
+    { q: "What language is spoken in Philippines?", opts: ["Tagalog", "Thai", "Vietnamese", "Malay"], answer: "Tagalog" },
+    { q: "What is the largest island in Philippines?", opts: ["Luzon", "Mindanao", "Visayas", "Palawan"], answer: "Luzon" },
+    { q: "Which sport is most popular in Philippines?", opts: ["Basketball", "Football", "Cricket", "Baseball"], answer: "Basketball" },
+    { q: "What color is the sun in Philippines flag?", opts: ["Yellow", "Red", "Blue", "White"], answer: "Yellow" },
+    { q: "Which fruit is famous in Philippines?", opts: ["Mango", "Apple", "Banana", "Orange"], answer: "Mango" },
+    { q: "What is the capital of Cebu?", opts: ["Cebu City", "Manila", "Davao", "Iloilo"], answer: "Cebu City" }
   ],
   Indonesia: [
-    {q:"What is the capital of Indonesia?", opts:["Jakarta","Bali"], ans:"Jakarta"},
-    {q:"What is the currency of Indonesia?", opts:["Rupiah","Ringgit"], ans:"Rupiah"}
+    { q: "What is the capital of Indonesia?", opts: ["Jakarta", "Bali", "Surabaya", "Medan"], answer: "Jakarta" },
+    { q: "What is the currency of Indonesia?", opts: ["Rupiah", "Ringgit", "Baht", "Peso"], answer: "Rupiah" },
+    { q: "What is the largest island in Indonesia?", opts: ["Java", "Sumatra", "Borneo", "Bali"], answer: "Borneo" },
+    { q: "What language is spoken in Indonesia?", opts: ["Indonesian", "Malay", "Thai", "Tagalog"], answer: "Indonesian" },
+    { q: "Which animal is from Indonesia?", opts: ["Komodo Dragon", "Panda", "Kangaroo", "Lion"], answer: "Komodo Dragon" },
+    { q: "What is the famous temple in Indonesia?", opts: ["Borobudur", "Angkor Wat", "Taj Mahal", "Eiffel Tower"], answer: "Borobudur" },
+    { q: "Which sport is popular in Indonesia?", opts: ["Badminton", "Football", "Cricket", "Hockey"], answer: "Badminton" },
+    { q: "What is the national dish of Indonesia?", opts: ["Nasi Goreng", "Sushi", "Pizza", "Burger"], answer: "Nasi Goreng" },
+    { q: "Which ocean borders Indonesia?", opts: ["Pacific", "Atlantic", "Arctic", "Southern"], answer: "Pacific" },
+    { q: "How many islands does Indonesia have?", opts: ["Over 17000", "100", "500", "1000"], answer: "Over 17000" }
   ],
   USA: [
-    {q:"What is the capital of USA?", opts:["Washington","New York"], ans:"Washington"},
-    {q:"What is the currency of USA?", opts:["Dollar","Euro"], ans:"Dollar"}
+    { q: "What is the capital of USA?", opts: ["Washington DC", "New York", "Los Angeles", "Chicago"], answer: "Washington DC" },
+    { q: "What is the currency of USA?", opts: ["Dollar", "Euro", "Pound", "Yen"], answer: "Dollar" },
+    { q: "How many states are in USA?", opts: ["50", "48", "51", "52"], answer: "50" },
+    { q: "Who was the first president of USA?", opts: ["George Washington", "Abraham Lincoln", "John Adams", "Thomas Jefferson"], answer: "George Washington" },
+    { q: "Which city is called the Big Apple?", opts: ["New York", "Los Angeles", "Chicago", "Miami"], answer: "New York" },
+    { q: "What is the largest state in USA?", opts: ["Alaska", "Texas", "California", "Florida"], answer: "Alaska" },
+    { q: "Which sport is called American Football?", opts: ["NFL", "NBA", "MLB", "NHL"], answer: "NFL" },
+    { q: "What is the national animal of USA?", opts: ["Bald Eagle", "Lion", "Bear", "Wolf"], answer: "Bald Eagle" },
+    { q: "Which river is longest in USA?", opts: ["Missouri", "Mississippi", "Colorado", "Ohio"], answer: "Missouri" },
+    { q: "Where is Hollywood?", opts: ["California", "Texas", "Florida", "New York"], answer: "California" }
   ],
   UK: [
-    {q:"What is the capital of UK?", opts:["London","Manchester"], ans:"London"},
-    {q:"What is the currency of UK?", opts:["Pound","Euro"], ans:"Pound"}
+    { q: "What is the capital of UK?", opts: ["London", "Manchester", "Birmingham", "Liverpool"], answer: "London" },
+    { q: "What is the currency of UK?", opts: ["Pound", "Euro", "Dollar", "Franc"], answer: "Pound" },
+    { q: "Which river runs through London?", opts: ["Thames", "Seine", "Danube", "Rhine"], answer: "Thames" },
+    { q: "What is the national animal of England?", opts: ["Lion", "Bulldog", "Horse", "Eagle"], answer: "Lion" },
+    { q: "Which sport started in England?", opts: ["Football", "Basketball", "Baseball", "Volleyball"], answer: "Football" },
+    { q: "What is the famous clock tower in London?", opts: ["Big Ben", "Eiffel Tower", "Statue of Liberty", "CN Tower"], answer: "Big Ben" },
+    { q: "Which band is from Liverpool?", opts: ["The Beatles", "Queen", "Coldplay", "ABBA"], answer: "The Beatles" },
+    { q: "What is the capital of Scotland?", opts: ["Edinburgh", "Glasgow", "Cardiff", "Belfast"], answer: "Edinburgh" },
+    { q: "What is the national dish of UK?", opts: ["Fish and Chips", "Pizza", "Burger", "Sushi"], answer: "Fish and Chips" },
+    { q: "Which queen ruled for 70 years?", opts: ["Queen Elizabeth II", "Queen Victoria", "Queen Mary", "Queen Anne"], answer: "Queen Elizabeth II" }
   ],
   Brazil: [
-    {q:"What is the capital of Brazil?", opts:["Brasilia","Rio"], ans:"Brasilia"},
-    {q:"What is the currency of Brazil?", opts:["Real","Peso"], ans:"Real"}
+    { q: "What is the capital of Brazil?", opts: ["Brasilia", "Rio", "Sao Paulo", "Salvador"], answer: "Brasilia" },
+    { q: "What is the currency of Brazil?", opts: ["Real", "Peso", "Dollar", "Euro"], answer: "Real" },
+    { q: "What language is spoken in Brazil?", opts: ["Portuguese", "Spanish", "French", "English"], answer: "Portuguese" },
+    { q: "Which sport is most popular in Brazil?", opts: ["Football", "Basketball", "Cricket", "Tennis"], answer: "Football" },
+    { q: "Which famous footballer is from Brazil?", opts: ["Pele", "Messi", "Ronaldo", "Mbappe"], answer: "Pele" },
+    { q: "What is the largest rainforest in Brazil?", opts: ["Amazon", "Congo", "Sahara", "Andes"], answer: "Amazon" },
+    { q: "Which festival is famous in Brazil?", opts: ["Carnival", "Christmas", "Easter", "Halloween"], answer: "Carnival" },
+    { q: "What is the famous statue in Rio?", opts: ["Christ the Redeemer", "Statue of Liberty", "Eiffel Tower", "Big Ben"], answer: "Christ the Redeemer" },
+    { q: "What color is in Brazil flag?", opts: ["Green and Yellow", "Red and White", "Blue and White", "Black and Red"], answer: "Green and Yellow" },
+    { q: "Which city hosted 2016 Olympics in Brazil?", opts: ["Rio", "Sao Paulo", "Brasilia", "Salvador"], answer: "Rio" }
+  ],
+  Nigeria: [
+    { q: "What is the capital of Nigeria?", opts: ["Abuja", "Lagos", "Kano", "Ibadan"], answer: "Abuja" },
+    { q: "What is the currency of Nigeria?", opts: ["Naira", "Cedi", "Dollar", "Rand"], answer: "Naira" },
+    { q: "What is the largest city in Nigeria?", opts: ["Lagos", "Abuja", "Kano", "Ibadan"], answer: "Lagos" },
+    { q: "Which year did Nigeria gain independence?", opts: ["1960", "1959", "1963", "1970"], answer: "1960" },
+    { q: "Which river is longest in Nigeria?", opts: ["River Niger", "River Benue", "River Ogun", "River Kaduna"], answer: "River Niger" }
+  ],
+  Ghana: [
+    { q: "What is the capital of Ghana?", opts: ["Accra", "Kumasi", "Tema", "Takoradi"], answer: "Accra" },
+    { q: "What is the currency of Ghana?", opts: ["Cedi", "Naira", "Dollar", "Rand"], answer: "Cedi" },
+    { q: "Which year did Ghana gain independence?", opts: ["1957", "1960", "1963", "1970"], answer: "1957" },
+    { q: "What is the largest lake in Ghana?", opts: ["Lake Volta", "Lake Chad", "Lake Victoria", "Lake Kainji"], answer: "Lake Volta" },
+    { q: "What is the main language in Ghana?", opts: ["English", "French", "Portuguese", "Swahili"], answer: "English" }
+  ],
+  Kenya: [
+    { q: "What is the capital of Kenya?", opts: ["Nairobi", "Mombasa", "Kisumu", "Nakuru"], answer: "Nairobi" },
+    { q: "What is the currency of Kenya?", opts: ["Shilling", "Naira", "Rand", "Cedi"], answer: "Shilling" },
+    { q: "What is the largest mountain in Kenya?", opts: ["Mount Kenya", "Mount Kilimanjaro", "Mount Everest", "Mount Cameroon"], answer: "Mount Kenya" },
+    { q: "Which ocean borders Kenya?", opts: ["Indian", "Atlantic", "Pacific", "Arctic"], answer: "Indian" },
+    { q: "What is the official language of Kenya?", opts: ["English and Swahili", "French", "Portuguese", "Arabic"], answer: "English and Swahili" }
+  ],
+  SouthAfrica: [
+    { q: "What is the capital of South Africa?", opts: ["Pretoria", "Cape Town", "Johannesburg", "Durban"], answer: "Pretoria" },
+    { q: "What is the currency of South Africa?", opts: ["Rand", "Naira", "Cedi", "Dollar"], answer: "Rand" },
+    { q: "Which city is called Mother City?", opts: ["Cape Town", "Johannesburg", "Durban", "Pretoria"], answer: "Cape Town" },
+    { q: "Who was the first Black president of South Africa?", opts: ["Nelson Mandela", "Thabo Mbeki", "Jacob Zuma", "Cyril Ramaphosa"], answer: "Nelson Mandela" },
+    { q: "What is the national animal of South Africa?", opts: ["Springbok", "Lion", "Elephant", "Zebra"], answer: "Springbok" }
+  ],
+  India: [
+    { q: "What is the capital of India?", opts: ["New Delhi", "Mumbai", "Kolkata", "Chennai"], answer: "New Delhi" },
+    { q: "What is the currency of India?", opts: ["Rupee", "Taka", "Rupiah", "Yen"], answer: "Rupee" },
+    { q: "Which monument is in Agra?", opts: ["Taj Mahal", "Red Fort", "Qutub Minar", "Gateway"], answer: "Taj Mahal" },
+    { q: "What is the national sport of India?", opts: ["Cricket", "Football", "Hockey", "Tennis"], answer: "Cricket" },
+    { q: "Which river is holy in India?", opts: ["Ganges", "Nile", "Amazon", "Danube"], answer: "Ganges" }
+  ],
+  Canada: [
+    { q: "What is the capital of Canada?", opts: ["Ottawa", "Toronto", "Vancouver", "Montreal"], answer: "Ottawa" },
+    { q: "What is the currency of Canada?", opts: ["Canadian Dollar", "US Dollar", "Euro", "Pound"], answer: "Canadian Dollar" },
+    { q: "What is the national animal of Canada?", opts: ["Beaver", "Moose", "Bear", "Wolf"], answer: "Beaver" },
+    { q: "Which sport is popular in Canada?", opts: ["Ice Hockey", "Football", "Cricket", "Baseball"], answer: "Ice Hockey" },
+    { q: "Which language is also official in Canada?", opts: ["French", "Spanish", "German", "Italian"], answer: "French" }
+  ],
+  Germany: [
+    { q: "What is the capital of Germany?", opts: ["Berlin", "Munich", "Hamburg", "Frankfurt"], answer: "Berlin" },
+    { q: "What is the currency of Germany?", opts: ["Euro", "Pound", "Dollar", "Franc"], answer: "Euro" },
+    { q: "Which car brand is from Germany?", opts: ["BMW", "Toyota", "Ferrari", "Tesla"], answer: "BMW" },
+    { q: "Which wall fell in 1989?", opts: ["Berlin Wall", "Great Wall", "Hadrian Wall", "Western Wall"], answer: "Berlin Wall" },
+    { q: "What is the national drink of Germany?", opts: ["Beer", "Wine", "Coffee", "Tea"], answer: "Beer" }
+  ],
+  France: [
+    { q: "What is the capital of France?", opts: ["Paris", "London", "Berlin", "Rome"], answer: "Paris" },
+    { q: "What is the famous tower in Paris?", opts: ["Eiffel Tower", "Big Ben", "Statue of Liberty", "CN Tower"], answer: "Eiffel Tower" },
+    { q: "What is the currency of France?", opts: ["Euro", "Franc", "Pound", "Dollar"], answer: "Euro" },
+    { q: "Which sport did France win World Cup in 2018?", opts: ["Football", "Basketball", "Tennis", "Rugby"], answer: "Football" },
+    { q: "What is the national dish of France?", opts: ["Croissant", "Pizza", "Burger", "Sushi"], answer: "Croissant" }
+  ],
+  Egypt: [
+    { q: "What is the capital of Egypt?", opts: ["Cairo", "Alexandria", "Giza", "Luxor"], answer: "Cairo" },
+    { q: "What is the famous structure in Egypt?", opts: ["Pyramids", "Eiffel Tower", "Taj Mahal", "Colosseum"], answer: "Pyramids" },
+    { q: "Which river runs through Egypt?", opts: ["Nile", "Amazon", "Danube", "Euphrates"], answer: "Nile" },
+    { q: "What is the currency of Egypt?", opts: ["Pound", "Dinar", "Dollar", "Euro"], answer: "Pound" },
+    { q: "Which desert is in Egypt?", opts: ["Sahara", "Gobi", "Kalahari", "Arabian"], answer: "Sahara" }
+  ],
+  Japan: [
+    { q: "What is the capital of Japan?", opts: ["Tokyo", "Osaka", "Kyoto", "Nagoya"], answer: "Tokyo" },
+    { q: "What is the currency of Japan?", opts: ["Yen", "Won", "Yuan", "Dollar"], answer: "Yen" },
+    { q: "Which food is from Japan?", opts: ["Sushi", "Pizza", "Burger", "Tacos"], answer: "Sushi" },
+    { q: "What is the famous mountain in Japan?", opts: ["Mount Fuji", "Mount Everest", "Mount Kenya", "Mount Kilimanjaro"], answer: "Mount Fuji" },
+    { q: "Which anime is from Japan?", opts: ["Naruto", "Tom and Jerry", "SpongeBob", "Mickey Mouse"], answer: "Naruto" }
+  ],
+  Australia: [
+    { q: "What is the capital of Australia?", opts: ["Canberra", "Sydney", "Melbourne", "Perth"], answer: "Canberra" },
+    { q: "What animal is only in Australia?", opts: ["Kangaroo", "Lion", "Tiger", "Bear"], answer: "Kangaroo" },
+    { q: "What is the famous opera house city?", opts: ["Sydney", "Melbourne", "Brisbane", "Perth"], answer: "Sydney" },
+    { q: "What is the currency of Australia?", opts: ["Australian Dollar", "US Dollar", "Euro", "Pound"], answer: "Australian Dollar" },
+    { q: "Which sport is popular in Australia?", opts: ["Cricket", "Football", "Hockey", "Baseball"], answer: "Cricket" }
   ]
 };
-function getQuizCountry(){ try{ return localStorage.getItem('quiz_country') || 'Nigeria'; }catch(e){ return 'Nigeria'; } }
-function changeCountry(){
-  var c = document.getElementById('quizCountry').value;
-  try{ localStorage.setItem('quiz_country', c); }catch(e){}
-  loadQuiz();
+
+const SOCIAL = {
+  Football: [
+    { q: "Which team won the 2022 World Cup?", opts: ["Argentina", "France", "Brazil", "England"], answer: "Argentina" },
+    { q: "Who is known as CR7?", opts: ["Cristiano Ronaldo", "Messi", "Neymar", "Mbappe"], answer: "Cristiano Ronaldo" },
+    { q: "How many players are on a football team on the field?", opts: ["11", "10", "9", "12"], answer: "11" },
+    { q: "Which club is called the Red Devils?", opts: ["Manchester United", "Chelsea", "Arsenal", "Liverpool"], answer: "Manchester United" },
+    { q: "Who won the Ballon d'Or in 2023?", opts: ["Messi", "Haaland", "Ronaldo", "Mbappe"], answer: "Messi" },
+    { q: "Which country hosted the 2022 World Cup?", opts: ["Qatar", "Brazil", "Russia", "USA"], answer: "Qatar" },
+    { q: "Who is called the GOAT of football by many?", opts: ["Messi", "Pele", "Maradona", "Ronaldo"], answer: "Messi" },
+    { q: "Which club is called Los Blancos?", opts: ["Real Madrid", "Barcelona", "Chelsea", "Juventus"], answer: "Real Madrid" }
+  ],
+  Movies: [
+    { q: "Which movie has Iron Man?", opts: ["Avengers", "Batman", "Spider-Man", "Superman"], answer: "Avengers" },
+    { q: "Who played Black Panther?", opts: ["Chadwick Boseman", "Will Smith", "Denzel Washington", "Kevin Hart"], answer: "Chadwick Boseman" },
+    { q: "Which movie is about a lion king?", opts: ["Lion King", "Toy Story", "Frozen", "Moana"], answer: "Lion King" },
+    { q: "Which movie has Harry Potter?", opts: ["Harry Potter", "Lord of the Rings", "Star Wars", "Avatar"], answer: "Harry Potter" },
+    { q: "Which movie made the most money ever?", opts: ["Avatar", "Titanic", "Avengers", "Frozen"], answer: "Avatar" },
+    { q: "Who is Spider-Man in Marvel movies?", opts: ["Tom Holland", "Chris Evans", "Robert Downey Jr", "Chris Hemsworth"], answer: "Tom Holland" },
+    { q: "Which movie is about toys that come alive?", opts: ["Toy Story", "Finding Nemo", "Shrek", "Moana"], answer: "Toy Story" },
+    { q: "Which movie has Elsa and Anna?", opts: ["Frozen", "Moana", "Brave", "Tangled"], answer: "Frozen" }
+  ],
+  Music: [
+    { q: "Who sang 'Calm Down'?", opts: ["Rema", "Burna Boy", "Wizkid", "Davido"], answer: "Rema" },
+    { q: "Which artist sang 'Essence'?", opts: ["Wizkid", "Davido", "Burna Boy", "Tems"], answer: "Wizkid" },
+    { q: "Who is known as the King of Pop?", opts: ["Michael Jackson", "Elvis Presley", "Beyonce", "Justin Bieber"], answer: "Michael Jackson" },
+    { q: "Who sang 'Shape of You'?", opts: ["Ed Sheeran", "Justin Bieber", "Adele", "Drake"], answer: "Ed Sheeran" },
+    { q: "Which artist is from Nigeria and sang 'Last Last'?", opts: ["Burna Boy", "Wizkid", "Davido", "Rema"], answer: "Burna Boy" },
+    { q: "Who sang 'Hello'?", opts: ["Adele", "Beyonce", "Rihanna", "Taylor Swift"], answer: "Adele" },
+    { q: "Which group sang 'Dynamite'?", opts: ["BTS", "Blackpink", "One Direction", "Coldplay"], answer: "BTS" },
+    { q: "Who is called Queen Bey?", opts: ["Beyonce", "Rihanna", "Adele", "Taylor Swift"], answer: "Beyonce" }
+  ],
+  Science: [
+    { q: "What is the largest planet?", opts: ["Jupiter", "Mars", "Saturn", "Earth"], answer: "Jupiter" },
+    { q: "What is H2O?", opts: ["Water", "Salt", "Oxygen", "Fire"], answer: "Water" },
+    { q: "How many continents are there?", opts: ["7", "5", "6", "8"], answer: "7" },
+    { q: "What is the fastest land animal?", opts: ["Cheetah", "Lion", "Horse", "Tiger"], answer: "Cheetah" },
+    { q: "Which phone company makes iPhone?", opts: ["Apple", "Samsung", "Google", "Nokia"], answer: "Apple" },
+    { q: "What planet do we live on?", opts: ["Earth", "Mars", "Venus", "Jupiter"], answer: "Earth" },
+    { q: "What gas do we breathe in to live?", opts: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], answer: "Oxygen" },
+    { q: "What is the chemical symbol for Gold?", opts: ["Au", "Ag", "Gd", "Go"], answer: "Au" }
+  ],
+  General: [
+    { q: "How many days are in a week?", opts: ["7", "5", "6", "8"], answer: "7" },
+    { q: "What color do you get when you mix blue and yellow?", opts: ["Green", "Purple", "Orange", "Red"], answer: "Green" },
+    { q: "What is the capital of the world for fashion?", opts: ["Paris", "London", "New York", "Milan"], answer: "Paris" },
+    { q: "Which animal is man's best friend?", opts: ["Dog", "Cat", "Horse", "Parrot"], answer: "Dog" }
+  ]
+};
+
+function getQuizCountry() {
+  return localStorage.getItem('quiz_country') || 'Philippines';
 }
-function loadQuiz(){
-  try{
-  var country = getQuizCountry();
-  var sel = document.getElementById('quizCountry');
-  if(sel) sel.value = country;
-  var list = QUIZZES[country] || QUIZZES['Nigeria'];
-  var dayNum = new Date().getDate();
-  var q = list[dayNum % list.length];
-  var qEl = document.getElementById('quizQ');
-  if(qEl) qEl.textContent = q.q;
-  var optEl = document.getElementById('quizOptions');
-  if(optEl){
-    optEl.innerHTML = '';
-    q.opts.forEach(function(o){
-      var b = document.createElement('button');
-      b.className = 'btn btn-secondary';
-      b.textContent = o;
-      b.onclick = function(){ answerQuiz(o); };
-      optEl.appendChild(b);
+
+function changeCountry() {
+  const select = document.getElementById('quizCountry');
+  if (select) {
+    localStorage.setItem('quiz_country', select.value);
+    loadQuiz();
+  }
+}
+
+function loadQuiz() {
+  const country = getQuizCountry();
+  const countryList = QUIZZES[country] || SOCIAL['General'];
+  const today = new Date();
+  const dayNum = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
+
+  let q;
+  let label = '';
+
+  if (dayNum % 2 === 0) {
+    // DAY 1, 3, 5, 7 = COUNTRY
+    q = countryList[dayNum % countryList.length];
+    label = country + ' Question';
+  } else {
+    // DAY 2, 4, 6, 8 = SOCIAL - rotates Football, Movies, Music, Science
+    const cats = ['Football', 'Movies', 'Music', 'Science'];
+    const catIndex = Math.floor(dayNum / 2) % cats.length;
+    const catName = cats[catIndex];
+    const list = SOCIAL[catName];
+    q = list[dayNum % list.length];
+    label = catName + ' Question';
+  }
+
+  const qEl = document.getElementById('quizQuestion') || document.getElementById('quizQ');
+  if (qEl) qEl.textContent = q.q;
+  const labelEl = document.getElementById('quizCategory');
+  if (labelEl) labelEl.textContent = label;
+
+  const optsBox = document.getElementById('quizOptions');
+  if (optsBox) {
+    optsBox.innerHTML = '';
+        window._currentQuiz = q;
+    q.opts.forEach(function(opt) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-secondary';
+      btn.textContent = opt;
+      btn.onclick = function() { answerQuiz(opt); };
+      optsBox.appendChild(btn);
     });
   }
-  var resEl = document.getElementById('quizResult');
-  if(resEl){
-    if(localStorage.getItem('quiz_done')===today){ resEl.textContent='Completed today. Come back tomorrow.'; }
-    else { resEl.textContent=''; }
   }
-  window._currentQuiz = q;
-  }catch(e){}
-}
+
 function answerQuiz(ans){
   if(localStorage.getItem('quiz_done')===today){ alert('You have already completed the quiz today.'); return; }
   var q = window._currentQuiz;
