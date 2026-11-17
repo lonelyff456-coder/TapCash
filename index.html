@@ -158,7 +158,7 @@ if(arenaState.date !== today){ arenaState.plays=0; arenaState.date=today; }
 function saveArena(){ try{ localStorage.setItem('arena_state', JSON.stringify(arenaState)); }catch(e){} }
 saveArena();
 var AdController = null;
-try{ if(window.Adsgram){ AdController = window.Adsgram.init({ blockId: "60023" }); } }catch(e){ AdController = null; }
+try{ if(window.Adsgram){ AdController = window.Adsgram.init({ blockId: "60213" }); } }catch(e){ AdController = null; }
 function save(){ try{ localStorage.setItem('tap_bal',bal); localStorage.setItem('tap_left',tapsLeft); localStorage.setItem('ads_today',adsToday); localStorage.setItem('ad_counts',JSON.stringify(adCounts)); localStorage.setItem('spins',spins); localStorage.setItem('earn_today',todayEarn); localStorage.setItem('referral_earned',referralEarned); localStorage.setItem('withdrawn_today',withdrawnToday); }catch(e){} render(); }
 function add(n){ bal+=n; todayEarn+=n; save(); }
 function usdValue(tap){ return tap / CONFIG.tapForOneDollar; }
