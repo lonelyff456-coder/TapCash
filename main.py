@@ -27,7 +27,7 @@ def run_server():
 threading.Thread(target=run_server, daemon=True).start()
 
 TOKEN = os.environ.get("BOT_TOKEN", "")
-WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://tapcash-2.onrender.com")
+WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://tapcash-liq6.onrender.com")
 
 bot = telebot.TeleBot(TOKEN)
 
