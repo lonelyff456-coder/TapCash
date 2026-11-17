@@ -33,8 +33,7 @@ WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://tapcash-2.onrender.com")
 
 bot = telebot.TeleBot(TOKEN)
 
-# NO users.json, NO balance, NO taps, NO TAP +10 outside
-# All earning is inside WebApp only
+# All game progress is inside WebApp only
 
 def main_menu():
     markup = types.InlineKeyboardMarkup()
@@ -47,9 +46,19 @@ def main_menu():
 def start(message):
     name = message.from_user.first_name
     text = f"Welcome {name} to TapCash Arena! 🎮\n\n"
-    text += "Tap to earn, watch ads, play Arena and withdraw USDT BNB.\n\n"
-    text += "Press PLAY below to open the app 👇"
+    text += "Play the tapping game, collect Coins, unlock new levels and get bonus Energy.\n\n"
+    text += "Tap, play and have fun with friends!\n\n"
+    text += "Press PLAY below to open the game 👇"
     bot.send_message(message.chat.id, text, reply_markup=main_menu())
 
-print("TapCash Arena Bot is running...")
-bot.infinity_polling()
+@bot.message_handler(commands=['privacy'])
+def privacy(message):
+    text = "TapCash Arena Privacy Policy:\n\n"
+    text += "We only use your Telegram ID to save your game progress and score. "
+    text += "We do not collect your password, phone number or private messages."
+    bot.send_message(message.chat.id, text)
+
+@bot.message_handler(commands=['about'])
+def about(message):
+    text = "About TapCash Arena:\n\n"
+    text += "TapCash Arena is a fun tapping game. Play, level up, collect
