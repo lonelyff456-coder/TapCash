@@ -6,6 +6,13 @@ from telebot import types
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
+        if self.path.startswith("/reward"):
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.wfile.write(b'{"ok": true}')
+            print("Reward for:", self.path)
+            return
         try:
             with open("index.html", "rb") as f:
                 content = f.read()
