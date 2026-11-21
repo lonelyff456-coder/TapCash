@@ -221,6 +221,41 @@ function doTap(){
   window.open(url, '_blank');
   completeAd(name);
   }
+
+// === Your real shortlinks ===
+const adsPlan = {
+  Monetag: 15,
+  Adsgram: 15,
+  OnClickA: 10,
+  Shortlinks: {
+    Shortlink1: 'https://shrinkme.click/aLAY',
+    Shortlink2: 'https://shrinkme.click/QuSLZg',
+    Shortlink3: 'https://shrinkme.click/rbJGVJC',
+    Shortlink4: 'https://shrinkme.click/yxEDeCk7'
+  }
+};
+
+// === Timer for Adsgram / OnClickA / Shortlink ===
+function startAdTimer(name){
+  let seconds = 11;
+  let el = document.getElementById('spinResult');
+  if(el){ el.innerText = name + ": Wait " + seconds + "s..."; }
+  if(window.adTimer){ clearInterval(window.adTimer); }
+  window.adTimer = setInterval(function(){
+    seconds--;
+    if(el){ el.innerText = name + ": Wait " + seconds + "s..."; }
+    if(seconds <= 0){
+      clearInterval(window.adTimer);
+      completeAd(name);
+    }
+  }, 1000);
+}
+
+// === Supportive OnClickA after main ad ===
+function triggerOnClickA_supportive(){
+  console.log("OnClickA supportive pop after main ad");
+}
+
 function watchAd(name){
   if(name==='Monetag'){
   if(typeof show_12265858 !== 'function'){ alert('No ad available right now. Please try again.'); return; }
@@ -274,7 +309,46 @@ function watchAd(name){
 
   return;
   }
+
+  if(name==='Adsgram'){
+    startAdTimer('Adsgram');
+    return;
+  }
+  if(name==='OnClickA'){
+    watchOnClickA();
+    return;
+  }
+  if(name==='Shortlink 1'){ watchShortlink(1); return; }
+  if(name==='Shortlink 2'){ watchShortlink(2); return; }
+  if(name==='Shortlink 3'){ watchShortlink(3); return; }
+  if(name==='Shortlink 4'){ watchShortlink(4); return; }
 }
+
+// === Buttons call these ===
+function watchMonetag(){ watchAd('Monetag'); }
+function watchAdsgram(){ watchAd('Adsgram'); }
+function watchOnClickA(){ startAdTimer('OnClickA'); }
+
+// === FIXED HERE: Now checks CONFIG first, then adsPlan, so it works with your screenshot ===
+function watchShortlink(n){
+  let shortlinks = null;
+  if(typeof CONFIG !== 'undefined' && CONFIG.adsPlan && CONFIG.adsPlan.Shortlinks){
+    shortlinks = CONFIG.adsPlan.Shortlinks;
+  } else if(typeof adsPlan !== 'undefined' && adsPlan.Shortlinks){
+    shortlinks = adsPlan.Shortlinks;
+  }
+  let url = shortlinks ? shortlinks['Shortlink' + n] : null;
+  if(!url){ alert('Shortlink ' + n + ' not found'); return; }
+  let a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  startAdTimer('Shortlink ' + n);
+}
+
 function completeAd(name){
   // 1. Give +5 TAP directly
   balance += 5;
@@ -289,18 +363,18 @@ function completeAd(name){
   counts[name] = (counts[name] || 0) + 1;
   localStorage.setItem('tapcash_adCounts', counts);
 
+  // === This part updates the screen ===
   if(typeof adCounts !== 'undefined'){ adCounts[name] = counts[name]; }
   if(typeof adsToday !== 'undefined'){ adsToday++; }
-
-  // 4. Refresh Earn page so counter moves immediately
   if(typeof renderEarn === 'function'){ renderEarn(); }
-  if(typeof updateEarnUI === 'function'){ updateEarnUI(); }
-  if(typeof showEarn === 'function'){ showEarn(); }
-
   let el = document.getElementById('spinResult');
-  if(el){ el.innerText = "Ad watched! +5 TAP + 1 Spin. Ads available: " + ads; }
-
+  if(el){ el.innerText = "Ad watched! +5 TAP + 1 Spin. Ads: " + ads; }
   alert('Ad completed! +5 TAP + 1 Spin');
+
+  // === Supportive OnClickA after main ad, not after itself ===
+  if(name !== 'OnClickA'){
+    triggerOnClickA_supportive();
+  }
 }
 function doSpin(){
   let today = new Date().toDateString();
