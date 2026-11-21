@@ -580,23 +580,136 @@ function playDice(g){
 }
 function playSimpleGame(name){
   if(arenaState.plays >= CONFIG.arenaMaxPlays){ alert('No Arena plays left today!'); return; }
-  let box = document.getElementById('gameResult');
-  box.innerHTML = "<b>" + name + "</b><br>Pick a number 1-5. Correct = +20 TAP!<br><br>" +
-    '<button class="btn btn-secondary" onclick="finishSimpleGame(\''+name+'\',1)">1</button> ' +
-    '<button class="btn btn-secondary" onclick="finishSimpleGame(\''+name+'\',2)">2</button> ' +
-    '<button class="btn btn-secondary" onclick="finishSimpleGame(\''+name+'\',3)">3</button> ' +
-    '<button class="btn btn-secondary" onclick="finishSimpleGame(\''+name+'\',4)">4</button> ' +
-    '<button class="btn btn-secondary" onclick="finishSimpleGame(\''+name+'\',5)">5</button>';
+  if(name === 'Tap Rush') return startTapRush();
+  if(name === 'Word Search') return startWordSearch();
+  if(name === 'Tic-Tac-Toe') return startTicTacToe();
+  if(name === 'Space Dodger') return startSpaceDodger();
 }
-function finishSimpleGame(name, pick){
+
+// --- TAP RUSH ---
+function startTapRush(){
+  arenaState.plays++; saveArena(); render();
+  let taps = 0;
+  let box = document.getElementById('gameResult');
+  box.innerHTML = "<b>⚡ Tap Rush</b><br>Tap as fast as you can! Need 10 taps in 5 sec to win +20 TAP!<br><br><div style='font-size:28px'>Taps: <span id='tapCount'>0</span></div><br><button class='btn btn-primary' id='tapBtn' style='font-size:24px;padding:16px'>TAP ME! 👆</button><p class='small' id='tapTimer'>Time: 5s</p>";
+  let timeLeft = 5;
+  let timer = setInterval(function(){
+    timeLeft--;
+    let t = document.getElementById('tapTimer');
+    if(t) t.innerText = "Time: " + timeLeft + "s";
+    if(timeLeft <= 0){
+      clearInterval(timer);
+      let btn = document.getElementById('tapBtn');
+      if(btn) btn.disabled = true;
+      if(taps >= 10){
+        add(20);
+        box.innerHTML += "<br><b>You WON! " + taps + " taps! +20 TAP 🎉</b>";
+      } else {
+        box.innerHTML += "<br><b>Too slow! " + taps + " taps. Need 10. Try again!</b>";
+      }
+      render();
+    }
+  }, 1000);
+  document.getElementById('tapBtn').onclick = function(){
+    taps++;
+    let c = document.getElementById('tapCount');
+    if(c) c.innerText = taps;
+  };
+}
+
+// --- WORD SEARCH ---
+function startWordSearch(){
+  let words = ['TAP','COIN','CASH','LUCKY','WIN','GOLD'];
+  let word = words[Math.floor(Math.random()*words.length)];
+  let options = [...words].sort(()=>Math.random()-0.5).slice(0,4);
+  if(!options.includes(word)) options[0] = word;
+  let box = document.getElementById('gameResult');
+  let html = "<b>🔤 Word Search</b><br>Find the word: <b style='font-size:20px'>" + word + "</b><br>Pick it below to win +20 TAP!<br><br>";
+  options.forEach(function(w){
+    html += '<button class="btn btn-secondary" onclick="finishWordSearch(\''+w+'\',\''+word+'\')">' + w + '</button> ';
+  });
+  box.innerHTML = html;
+}
+function finishWordSearch(pick, correct){
   if(arenaState.plays >= CONFIG.arenaMaxPlays){ alert('No Arena plays left today!'); return; }
   arenaState.plays++; saveArena();
-  var correct = Math.floor(Math.random()*5)+1;
   if(pick === correct){
     add(20);
-    document.getElementById('gameResult').innerHTML = "<b>" + name + " — You WON! +20 TAP 🎉</b><br>Secret was " + correct;
+    document.getElementById('gameResult').innerHTML = "<b>Word Search — You FOUND it! +20 TAP 🎉</b>";
   } else {
-    document.getElementById('gameResult').innerHTML = "<b>" + name + " — Wrong! Secret was " + correct + "</b><br>Try again!";
+    document.getElementById('gameResult').innerHTML = "<b>Word Search — Wrong! It was " + correct + "</b>";
+  }
+  render();
+}
+
+// --- TIC-TAC-TOE ---
+let tttBoard = ["","","","","","","","",""];
+function startTicTacToe(){
+  arenaState.plays++; saveArena(); render();
+  tttBoard = ["","","","","","","","",""];
+  renderTTT("Your turn! You are ❌");
+}
+function renderTTT(msg){
+  let box = document.getElementById('gameResult');
+  let html = "<b>❌⭕ Tic-Tac-Toe</b><br>" + msg + "<br><br><div style='display:grid;grid-template-columns:repeat(3,50px);gap:5px;justify-content:center'>";
+  for(let i=0;i<9;i++){
+    html += '<button class="btn btn-secondary" style="height:50px;font-size:20px" onclick="tttMove('+i+')">' + (tttBoard[i] || '&nbsp;') + '</button>';
+  }
+  html += "</div>";
+  box.innerHTML = html;
+}
+function tttMove(i){
+  if(tttBoard[i] !== "") return;
+  tttBoard[i] = "❌";
+  let w = tttWinner();
+  if(w){ return endTTT(w); }
+  if(!tttBoard.includes("")){ return endTTT("draw"); }
+  // Computer move
+  let empty = [];
+  tttBoard.forEach(function(v,idx){ if(v==="") empty.push(idx); });
+  let c = empty[Math.floor(Math.random()*empty.length)];
+  tttBoard[c] = "⭕";
+  w = tttWinner();
+  if(w){ return endTTT(w); }
+  if(!tttBoard.includes("")){ return endTTT("draw"); }
+  renderTTT("Your turn! You are ❌");
+}
+function tttWinner(){
+  let lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for(let l of lines){
+    if(tttBoard[l[0]] && tttBoard[l[0]]===tttBoard[l[1]] && tttBoard[l[1]]===tttBoard[l[2]]) return tttBoard[l[0]];
+  }
+  return null;
+}
+function endTTT(result){
+  if(result === "❌"){
+    add(20);
+    renderTTT("You WON! +20 TAP 🎉");
+  } else if(result === "⭕"){
+    renderTTT("Computer won! Try again!");
+  } else {
+    renderTTT("Draw! No win, try again!");
+  }
+  render();
+}
+
+// --- SPACE DODGER ---
+function startSpaceDodger(){
+  let danger = Math.floor(Math.random()*3)+1;
+  let box = document.getElementById('gameResult');
+  box.innerHTML = "<b>🚀 Space Dodger</b><br>An asteroid is coming! Pick a SAFE lane to win +20 TAP!<br><br>" +
+    '<button class="btn btn-secondary" onclick="finishDodger(1,'+danger+')">⬅️ Left</button> ' +
+    '<button class="btn btn-secondary" onclick="finishDodger(2,'+danger+')">⬆️ Middle</button> ' +
+    '<button class="btn btn-secondary" onclick="finishDodger(3,'+danger+')">➡️ Right</button>';
+}
+function finishDodger(pick, danger){
+  if(arenaState.plays >= CONFIG.arenaMaxPlays){ alert('No Arena plays left today!'); return; }
+  arenaState.plays++; saveArena();
+  if(pick === danger){
+    document.getElementById('gameResult').innerHTML = "<b>💥 CRASH! Asteroid was in that lane! Try again!</b>";
+  } else {
+    add(20);
+    document.getElementById('gameResult').innerHTML = "<b>🚀 You DODGED it! +20 TAP 🎉</b><br>Asteroid was in lane " + danger;
   }
   render();
 }
