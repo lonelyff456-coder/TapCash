@@ -244,6 +244,25 @@ function watchAd(name){
     return;
   }
 }
+
+function completeAd(name){
+  // Shortlink gives +5 TAP directly
+  if(name && name.indexOf('Shortlink')===0){
+    balance += 5;
+    updateBalance();
+    alert('Shortlink completed! +5 TAP');
+    return;
+  }
+
+  // Normal ads (Monetag / Adsgram / OnClickA) unlock 1 spin
+  let ads = parseInt(localStorage.getItem('tapcash_adsWatched') || '0') + 1;
+  localStorage.setItem('tapcash_adsWatched', ads);
+
+  let el = document.getElementById('spinResult');
+  if(el){ el.innerText = "Ad watched! You can spin now. Ads available: " + ads; }
+
+  alert('Ad completed! You can spin now.');
+}
 function completeAd(name){
   adCounts[name]=(adCounts[name]||0)+1; adsToday++; add(CONFIG.tapPerAd);
   alert('You earned +'+CONFIG.tapPerAd+' TAP');
