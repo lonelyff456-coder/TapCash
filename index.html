@@ -223,9 +223,17 @@ function doTap(){
   }
 function watchAd(name){
   if(name==='Monetag'){
-    if(typeof show_12265858 !== 'function'){ alert('No ad available right now. Please try again.'); return; }
-    show_12265858().then(function(){ completeAd(name); }).catch(function(){ alert('Please watch the full ad to earn your reward.'); });
-    return;
+  if(typeof show_12265858 !== 'function'){ alert('No ad available right now. Please try again.'); return; }
+  let done = false;
+  function doDone(){
+    if(done) return;
+    done = true;
+    completeAd(name);
+  }
+  show_12265858().then(function(){ doDone(); }).catch(function(){ doDone(); });
+  // Fallback: if Monetag doesn't call back, count it after 5 seconds
+  setTimeout(function(){ doDone(); }, 5000);
+  return;
   }
   if(name==='Adsgram'){
     if(!AdController){ alert('No ad available right now. Please try again.'); return; }
