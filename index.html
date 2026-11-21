@@ -122,20 +122,22 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #333;ba
 var CONFIG = {
   tapForOneDollar: 2000,
   tapPerAd: 5,
-  checkinRewards: [50, 60, 70, 80, 90, 100, 150],
+  checkinReward: 50, // LOCKED - 50 every day, no increase
   arenaMaxPlays: 8,
+  arenaRewardPerPlay: 25, // LOCKED - 200 TAP / 8 plays = 25
+  quizReward: 50,
   minWithdrawUsd: 1,
   maxWithdrawUsdPerDay: 3,
   withdrawFee: 0,
   referralPercent: 20,
-  adsPlan: { Monetag: 15, Adsgram: 15, OnClickA: 10, Shortlink1: 02, Shortlink2: 02, Shortlink3: 02, Shortlink4: 02 },
-      shortlinks: {
-      Shortlink1: "https://shrinkme.click/aLAY",
-      Shortlink2: "https://shrinkme.click/Qu5Lzg",
-      Shortlink3: "https://shrinkme.click/rbJGVJC",
-      Shortlink4: "https://shrinkme.click/yxEDeCk7"
-    },
-  totalAdsPerDay: 80
+  adsPlan: { Monetag: 15, Adsgram: 15, OnClickA: 10, Shortlink1: 2, Shortlink2: 2, Shortlink3: 2, Shortlink4: 2 },
+  shortlinks: {
+    Shortlink1: "https://shrinkme.click/aLAY",
+    Shortlink2: "https://shrinkme.click/Qu5Lzg",
+    Shortlink3: "https://shrinkme.click/rbJGVJC",
+    Shortlink4: "https://shrinkme.click/yxEDeCk7"
+  },
+  totalAdsPerDay: 48 // LOCKED - 15+15+10+2+2+2+2 = 48
 };
 var bal = parseFloat(localStorage.getItem('tap_bal')||0);
 var tapsLeft = parseInt(localStorage.getItem('tap_left')||500);
