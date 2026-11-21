@@ -224,35 +224,56 @@ function doTap(){
 function watchAd(name){
   if(name==='Monetag'){
   if(typeof show_12265858 !== 'function'){ alert('No ad available right now. Please try again.'); return; }
+
   let done = false;
+  let adTimeLeft = 11;
+  let adFinished = false;
+
+  // Lock Continue button at start
+  let continueBtn = document.getElementById('continue-btn');
+  if(continueBtn){
+    continueBtn.disabled = true;
+    continueBtn.style.background = 'grey';
+  }
+
+  // Start 11 sec timer - top timer
+  let adTimer = setInterval(function(){
+    adTimeLeft--;
+    let topTimer = document.getElementById('timer-top');
+    if(topTimer) topTimer.innerText = '00:' + adTimeLeft;
+
+    if(adTimeLeft <= 0){
+      clearInterval(adTimer);
+      adFinished = true;
+      if(continueBtn){
+        continueBtn.disabled = false;
+        continueBtn.style.background = '#007bff';
+      }
+    }
+  }, 1000);
+
   function doDone(){
     if(done) return;
+    // If timer not finished, NO REWARD
+    if(!adFinished){
+      alert('Wait for timer to finish! No reward if you rush.');
+      return;
+    }
     done = true;
+    clearInterval(adTimer);
     completeAd(name);
   }
-  show_12265858().then(function(){ doDone(); }).catch(function(){ doDone(); });
-  // Fallback: if Monetag doesn't call back, count it after 5 seconds
-  setTimeout(function(){ doDone(); }, 5000);
-  return;
-  }
-  if(name==='Adsgram'){
-    if(!AdController){ alert('No ad available right now. Please try again.'); return; }
-    AdController.show().then(function(result){ if(result && result.done){ completeAd(name); } }).catch(function(){ alert('Please watch the full ad to earn your reward.'); });
-    return;
-  }
-  if(name==='OnClickA'){
-    if(typeof show_12265858 === 'function'){
-      show_12265858().then(function(){ completeAd(name); }).catch(function(){ alert('No ad available right now. Please try again.'); });
-    } else { alert('No ad available right now. Please try again.'); }
-    return;
-  }
-  if(name.indexOf('Shortlink')===0){
-    window.open(CONFIG.shortlinks[name], '_blank');
-    setTimeout(function(){ if(confirm('Did you complete this page? Tap OK to claim +5 TAP.')){ completeAd(name); } }, 2000);
-    return;
-  }
-}
 
+  // When Monetag ad finishes / user presses Continue, check timer
+  show_12265858().then(function(){ doDone(); }).catch(function(){ doDone(); });
+
+  // If Continue button exists, it also uses same check
+  if(continueBtn){
+    continueBtn.onclick = function(){ doDone(); };
+  }
+
+  return;
+                    }
 function completeAd(name){
   // Shortlink gives +5 TAP directly
   if(name && name.indexOf('Shortlink')===0){
