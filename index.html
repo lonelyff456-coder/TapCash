@@ -176,7 +176,7 @@ function render(){
   var pct = Math.min(100, (adsToday / CONFIG.totalAdsPerDay) * 100);
   document.getElementById('dailyTaskBar').style.width = pct + '%';
   document.getElementById('refInfo').textContent = 'You have earned ' + referralEarned.toFixed(0) + ' TAP from referrals. You earn 20% of your friends earnings.';
-  var nextReward = CONFIG.checkinRewards[Math.min(checkinDay,6)];
+  var reward = CONFIG.checkinReward;
   document.getElementById('checkinText').textContent = 'Claim your daily reward.';
   var lastCheckin = localStorage.getItem('last_checkin')||'';
   var b=document.getElementById('checkinBtn');
