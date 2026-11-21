@@ -253,7 +253,7 @@ function doSpin(){
 function checkin(){
   var last = localStorage.getItem('last_checkin')||'';
   if(last===today){ alert('You have already claimed your check-in today.'); return; }
-  var reward = CONFIG.checkinRewards[Math.min(checkinDay,6)];
+  var reward = CONFIG.checkinReward;
   localStorage.setItem('last_checkin', today);
   checkinDay++; localStorage.setItem('checkin_day', checkinDay);
   add(reward); alert('Daily Check-in +'+reward+' TAP');
