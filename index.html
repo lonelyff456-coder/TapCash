@@ -265,23 +265,50 @@ function completeAd(name){
   // Normal ads (Monetag / Adsgram / OnClickA) unlock 1 spin
   let ads = parseInt(localStorage.getItem('tapcash_adsWatched') || '0') + 1;
   localStorage.setItem('tapcash_adsWatched', ads);
+    if(typeof adCounts !== 'undefined'){ adCounts[name]=(adCounts[name]||0)+1; }
+  if(typeof adsToday !== 'undefined'){ adsToday++; }
 
   let el = document.getElementById('spinResult');
   if(el){ el.innerText = "Ad watched! You can spin now. Ads available: " + ads; }
 
   alert('Ad completed! You can spin now.');
 }
-function completeAd(name){
-  adCounts[name]=(adCounts[name]||0)+1; adsToday++; add(CONFIG.tapPerAd);
-  alert('You earned +'+CONFIG.tapPerAd+' TAP');
-}
 function doSpin(){
-  if(spins>0){ alert('Please watch 1 ad first to spin again.'); return; }
-  spins++;
-  var r=Math.random()*100, win=5;
-  if(r<70) win=5; else if(r<90) win=10; else if(r<99) win=15; else win=50;
+  let today = new Date().toDateString();
+  let spinDate = localStorage.getItem('tapcash_spinDate');
+  let spinsToday = parseInt(localStorage.getItem('tapcash_spinsToday') || '0');
+  let adsWatched = parseInt(localStorage.getItem('tapcash_adsWatched') || '0');
+
+  if(spinDate !== today){
+    spinsToday = 0;
+    adsWatched = 0;
+    localStorage.setItem('tapcash_spinDate', today);
+    localStorage.setItem('tapcash_spinsToday', '0');
+    localStorage.setItem('tapcash_adsWatched', '0');
+  }
+
+  if(spinsToday >= 5){
+    document.getElementById('spinResult').innerText = "Daily spin limit reached (5/5). Come back tomorrow!";
+    return;
+  }
+
+  if(spinsToday >= 1 && adsWatched <= 0){
+    alert('Please watch 1 ad first to spin again. (' + spinsToday + '/5 used today)');
+    return;
+  }
+
+  if(spinsToday >= 1){
+    adsWatched--;
+    localStorage.setItem('tapcash_adsWatched', adsWatched);
+  }
+
+  spinsToday++;
+  localStorage.setItem('tapcash_spinsToday', spinsToday);
+
+  var r = Math.random()*100, win = 5;
+  if(r < 70) win = 5; else if(r < 90) win = 10; else if(r < 99) win = 15; else win = 25;
   add(win);
-  document.getElementById('spinResult').textContent='You won +'+win+' TAP!';
+  document.getElementById('spinResult').textContent = 'You won ' + win + ' TAP! Spins today: ' + spinsToday + '/5';
 }
 function checkin(){
   var last = localStorage.getItem('last_checkin')||'';
