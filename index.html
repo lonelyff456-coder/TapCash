@@ -579,18 +579,24 @@ function playDice(g){
   render();
 }
 function playSimpleGame(name){
-  if(arenaState.plays >= CONFIG.arenaMaxPlays){ alert('You have used all your plays for today. Come back tomorrow.'); return; }
-  var guess = prompt(name + ': Guess a number from 1 to 5');
-  if(guess === null) return;
-  guess = parseInt(guess);
-  if(!guess || guess < 1 || guess > 5){ alert('Enter a number 1 to 5'); return; }
+  if(arenaState.plays >= CONFIG.arenaMaxPlays){ alert('No Arena plays left today!'); return; }
+  let box = document.getElementById('gameResult');
+  box.innerHTML = "<b>" + name + "</b><br>Pick a number 1-5. Correct = +20 TAP!<br><br>" +
+    '<button class="btn btn-secondary" onclick="finishSimpleGame(\''+name+'\',1)">1</button> ' +
+    '<button class="btn btn-secondary" onclick="finishSimpleGame(\''+name+'\',2)">2</button> ' +
+    '<button class="btn btn-secondary" onclick="finishSimpleGame(\''+name+'\',3)">3</button> ' +
+    '<button class="btn btn-secondary" onclick="finishSimpleGame(\''+name+'\',4)">4</button> ' +
+    '<button class="btn btn-secondary" onclick="finishSimpleGame(\''+name+'\',5)">5</button>';
+}
+function finishSimpleGame(name, pick){
+  if(arenaState.plays >= CONFIG.arenaMaxPlays){ alert('No Arena plays left today!'); return; }
   arenaState.plays++; saveArena();
   var correct = Math.floor(Math.random()*5)+1;
-  if(guess === correct){
+  if(pick === correct){
     add(20);
-    document.getElementById('gameResult').textContent = name + ': Correct! Number was ' + correct + '. You earned +20 TAP';
+    document.getElementById('gameResult').innerHTML = "<b>" + name + " — You WON! +20 TAP 🎉</b><br>Secret was " + correct;
   } else {
-    document.getElementById('gameResult').textContent = name + ': Wrong! You guessed ' + guess + ', number was ' + correct + '. Try again!';
+    document.getElementById('gameResult').innerHTML = "<b>" + name + " — Wrong! Secret was " + correct + "</b><br>Try again!";
   }
   render();
 }
