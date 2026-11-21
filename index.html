@@ -204,9 +204,11 @@ function render(){
 }
 function show(id, el){
   ['homePage','earnPage','arenaPage','friendsPage','walletPage'].forEach(function(p){
-    document.getElementById(p).classList.add('hidden');
+    var page = document.getElementById(p);
+    if(page) page.classList.add('hidden');
   });
-  document.getElementById(id).classList.remove('hidden');
+  var target = document.getElementById(id);
+  if(target) target.classList.remove('hidden');
   document.querySelectorAll('.nav div').forEach(function(d){ d.classList.remove('active'); });
   if(el) el.classList.add('active');
 }
