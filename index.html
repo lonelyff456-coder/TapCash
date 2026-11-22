@@ -332,12 +332,7 @@ function watchOnClickA(){ startAdTimer('OnClickA'); }
 
 // === FIXED HERE: Now checks CONFIG first, then adsPlan, so it works with your screenshot ===
 function watchShortlink(n){
-  let shortlinks = null;
-  if(typeof CONFIG !== 'undefined' && CONFIG.adsPlan && CONFIG.adsPlan.Shortlinks){
-    shortlinks = CONFIG.adsPlan.Shortlinks;
-  } else if(typeof adsPlan !== 'undefined' && adsPlan.Shortlinks){
-    shortlinks = adsPlan.Shortlinks;
-  }
+  let shortlinks = CONFIG.shortlinks;
   let url = shortlinks ? shortlinks['Shortlink' + n] : null;
   if(!url){ alert('Shortlink ' + n + ' not found'); return; }
   let a = document.createElement('a');
