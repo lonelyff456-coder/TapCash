@@ -354,26 +354,6 @@ function completeAd(name){
   localStorage.setItem('tapcash_adsWatched', ads);
   alert('Ad completed! +5 TAP + 1 Spin');
 }
-  let ads = parseInt(localStorage.getItem('tapcash_adsWatched') || '0') + 1;
-  localStorage.setItem('tapcash_adsWatched', ads);
-
-  // 3. Increase ONLY that network's counter - Monetag 2/15 -> 3/15
-  let counts = JSON.parse(localStorage.getItem('tapcash_adCounts') || '{}');
-  counts[name] = (counts[name] || 0) + 1;
-  localStorage.setItem('tapcash_adCounts', counts);
-
-  // === This part updates the screen ===
-  if(typeof adCounts !== 'undefined'){ adCounts[name] = counts[name]; }
-  if(typeof adsToday !== 'undefined'){ adsToday++; }
-  if(typeof renderEarn === 'function'){ renderEarn(); }
-  let el = document.getElementById('spinResult');
-  if(el){ el.innerText = "Ad watched! +5 TAP + 1 Spin. Ads: " + ads; }
-  alert('Ad completed! +5 TAP + 1 Spin');
-
-  // === Supportive OnClickA after main ad, not after itself ===
-  if(name !== 'OnClickA'){
-    triggerOnClickA_supportive();
-  }
 }
 function doSpin(){
   let today = new Date().toDateString();
