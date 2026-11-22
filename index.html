@@ -185,7 +185,7 @@ function render(){
     if(lastCheckin===today){ b.textContent='Claimed Today - Come Back Tomorrow'; b.disabled=true; b.style.background='#333'; }
     else { b.textContent='Claim +'+nextReward+' TAP'; b.disabled=false; b.style.background='#2563eb'; }
   }
-  var icons = {Monetag:'🔵',Adsgram:'✈️',OnClickA:'🟢',Shortlink1:'🔗',Shortlink2:'🔗',Shortlink3:'🔗',Shortlink4:'🔗'};
+  var icons = {Monetag:'🔵',Adsgram:'✈️',GigaPub:'🟢',Shortlink1:'🔗',Shortlink2:'🔗',Shortlink3:'🔗',Shortlink4:'🔗'};
   var labels = {Monetag:'Monetag',Adsgram:'Adsgram',GigaPub:'GigaPub',Shortlink1:'Shortlink 1',Shortlink2:'Shortlink 2',Shortlink3:'Shortlink 3',Shortlink4:'Shortlink 4'};
   var html='';
   Object.keys(CONFIG.adsPlan).forEach(function(name){
