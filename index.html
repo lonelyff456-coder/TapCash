@@ -270,17 +270,7 @@ function triggerOnClickA_supportive(){
   });
 });
 function openOfferWall(){
-  if(window.gigaOfferWallSDK){
-    window.gigaOfferWallSDK.open();
-    return;
-  }
-  var uid = 'guest';
-  try{
-    if(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user){
-      uid = window.Telegram.WebApp.initDataUnsafe.user.id;
-    }
-  }catch(e){}
-  window.open('https://wall.giga.pub/wall?projectId=9308&userId=' + uid, '_blank');
+  window.Telegram.WebApp.openLink("https://link.gigapub.tech/l/x00j9zori");
 }
 function watchAd(name){
   if(name=='GigaPub'){
