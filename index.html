@@ -146,12 +146,12 @@ var today = new Date().toDateString();
 var tapsDate = localStorage.getItem('tap_date')||'';
 if(tapsDate!==today){ tapsLeft=500; localStorage.setItem('tap_date',today); }
 var adsToday = parseInt(localStorage.getItem('ads_today')||0);
-var adCounts = JSON.parse(localStorage.getItem('ad_counts')||'{"Monetag":0,"Adsgram":0,"OnClickA":0,"Shortlink1":0,"Shortlink2":0,"Shortlink3":0,"Shortlink4":0}');
+var adCounts = JSON.parse(localStorage.getItem('ad_counts')||'{"Monetag":0,"Adsgram":0,"GigaPub":0,"Shortlink1":0,"Shortlink2":0,"Shortlink3":0,"Shortlink4":0}');
 var spins = parseInt(localStorage.getItem('spins')||0);
 var todayEarn = parseFloat(localStorage.getItem('earn_today')||0);
 var referralEarned = parseFloat(localStorage.getItem('referral_earned')||0);
 var adsDate = localStorage.getItem('ads_date')||'';
-if(adsDate!==today){ adsToday=0; adCounts={"Monetag":0,"Adsgram":0,"OnClickA":0,"Shortlink1":0,"Shortlink2":0,"Shortlink3":0,"Shortlink4":0}; localStorage.setItem('ads_date',today); }
+if(adsDate!==today){ adsToday=0; adCounts={"Monetag":0,"Adsgram":0,"GigaPub":0,"Shortlink1":0,"Shortlink2":0,"Shortlink3":0,"Shortlink4":0}; localStorage.setItem('ads_date',today); }
 var checkinDay = parseInt(localStorage.getItem('checkin_day')||0);
 var withdrawnToday = parseFloat(localStorage.getItem('withdrawn_today')||0);
 var withdrawnDate = localStorage.getItem('withdrawn_date')||'';
@@ -186,7 +186,7 @@ function render(){
     else { b.textContent='Claim +'+nextReward+' TAP'; b.disabled=false; b.style.background='#2563eb'; }
   }
   var icons = {Monetag:'🔵',Adsgram:'✈️',OnClickA:'🟢',Shortlink1:'🔗',Shortlink2:'🔗',Shortlink3:'🔗',Shortlink4:'🔗'};
-  var labels = {Monetag:'Monetag',Adsgram:'Adsgram',OnClickA:'OnClickA',Shortlink1:'Shortlink 1',Shortlink2:'Shortlink 2',Shortlink3:'Shortlink 3',Shortlink4:'Shortlink 4'};
+  var labels = {Monetag:'Monetag',Adsgram:'Adsgram',GigaPub:'GigaPub',Shortlink1:'Shortlink 1',Shortlink2:'Shortlink 2',Shortlink3:'Shortlink 3',Shortlink4:'Shortlink 4'};
   var html='';
   Object.keys(CONFIG.adsPlan).forEach(function(name){
     var c=adCounts[name]||0;
