@@ -346,10 +346,14 @@ function watchShortlink(n){
 }
 
 function completeAd(name){
-  // 1. Give +5 TAP directly
-  balance += 5;
-  updateBalance();
-
+  var key = name.replace(' ','');
+  adCounts[key] = (adCounts[key] || 0) + 1;
+  adsToday++;
+  add(CONFIG.tapPerAd);
+  var ads = parseInt(localStorage.getItem('tapcash_adsWatched') || '0') + 1;
+  localStorage.setItem('tapcash_adsWatched', ads);
+  alert('Ad completed! +5 TAP + 1 Spin');
+}
   // 2. Give 1 Spin - this is your spin credit
   let ads = parseInt(localStorage.getItem('tapcash_adsWatched') || '0') + 1;
   localStorage.setItem('tapcash_adsWatched', ads);
