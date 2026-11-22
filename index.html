@@ -255,10 +255,31 @@ function startAdTimer(name){
 function triggerOnClickA_supportive(){
   console.log("OnClickA supportive pop after main ad");
 }
-
+// === GigaPub ===
+(window.loadGigaSDKCallbacks || (window.loadGigaSDKCallbacks = [])).push(() => {
+  window.loadOfferWallSDK({ projectId: '9308' })
+  .then(sdk => {
+    window.gigaOfferWallSDK = sdk;
+    sdk.on('rewardClaim', async (data) => {
+      // Give reward - 50 TAP for now
+      tapLeft += 50;
+      save();
+      render();
+      sdk.confirmReward(data.rewardId, data.hash);
+    });
+  });
+});
+function openOfferWall(){
+  if(window.gigaOfferWallSDK){
+    window.gigaOfferWallSDK.open();
+  } else {
+    alert('Ads loading, try again');
+  }
+}
 function watchAd(name){
-  if(name==='Monetag'){
-  if(typeof show_12265858 !== 'function'){ alert('No ad available right now. Please try again.'); return; }
+  if(name=='Monetag'){
+  openOfferWall(); return;
+  if(typeof show_12265858 == "function"){ alert('No ad available right now. Please try again.'); return; }
 
   let done = false;
   let adTimeLeft = 11;
