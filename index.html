@@ -272,9 +272,15 @@ function triggerOnClickA_supportive(){
 function openOfferWall(){
   if(window.gigaOfferWallSDK){
     window.gigaOfferWallSDK.open();
-  } else {
-    alert('Ads loading, try again');
+    return;
   }
+  var uid = 'guest';
+  try{
+    if(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user){
+      uid = window.Telegram.WebApp.initDataUnsafe.user.id;
+    }
+  }catch(e){}
+  window.open('https://wall.giga.pub/wall?projectId=9308&userId=' + uid, '_blank');
 }
 function watchAd(name){
   if(name=='GigaPub'){
