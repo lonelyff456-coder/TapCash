@@ -261,8 +261,8 @@ function triggerOnClickA_supportive(){
   .then(sdk => {
     window.gigaOfferWallSDK = sdk;
     sdk.on('rewardClaim', async (data) => {
-      // Give reward - 50 TAP for now
-      tapLeft += 50;
+      // Give reward - 5 TAP for now
+      tapLeft += 5;
       save();
       render();
       sdk.confirmReward(data.rewardId, data.hash);
