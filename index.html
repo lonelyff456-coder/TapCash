@@ -273,75 +273,43 @@ function openOfferWall(){
   window.Telegram.WebApp.openLink("https://link.gigapub.tech/l/x00j9zori");
 }
 function watchAd(name){
+  // === GIGAPUB ADS ONLY - No sign-up, video ad only ===
   if(name=='GigaPub'){
-    openOfferWall(); return;
-    }
-  if(name=='Monetag'){
-  if(typeof show_12265858 == "function"){ alert('No ad available right now. Please try again.'); return; }
-
-  let done = false;
-  let adTimeLeft = 11;
-  let adFinished = false;
-
-  // Lock Continue button at start
-  let continueBtn = document.getElementById('continue-btn');
-  if(continueBtn){
-    continueBtn.disabled = true;
-    continueBtn.style.background = 'grey';
+    document.getElementById('spinResult').innerText = 'Loading GigaPub Ad...';
+    window.showGiga("main")
+    .then(() => {
+      completeAd('GigaPub');
+    })
+    .catch(e => {
+      alert('GigaPub ad not completed. Try again.');
+    });
+    return;
   }
 
-  // Start 11 sec timer - top timer
-  let adTimer = setInterval(function(){
-    adTimeLeft--;
-    let topTimer = document.getElementById('timer-top');
-    if(topTimer) topTimer.innerText = '00:' + adTimeLeft;
-
-    if(adTimeLeft <= 0){
-      clearInterval(adTimer);
-      adFinished = true;
-      if(continueBtn){
-        continueBtn.disabled = false;
-        continueBtn.style.background = '#007bff';
-      }
-    }
-  }, 1000);
-
-  function doDone(){
-    if(done) return;
-    // If timer not finished, NO REWARD
-    if(!adFinished){
-      alert('Wait for timer to finish! No reward if you rush.');
+  // === MONETAG - FIXED ===
+  if(name=='Monetag'){
+    if(typeof show_12265858 !== "function"){
+      alert('Monetag not loaded yet. Close and open app again.');
       return;
     }
-    done = true;
-    clearInterval(adTimer);
-    completeAd(name);
-  }
-
-  // When Monetag ad finishes / user presses Continue, check timer
-  show_12265858().then(function(){ doDone(); }).catch(function(){ doDone(); });
-
-  // If Continue button exists, it also uses same check
-  if(continueBtn){
-    continueBtn.onclick = function(){ doDone(); };
-  }
-
-  return;
+    // No more fake "No ad" alert here
+    show_12265858().then(function(){
+      completeAd(name);
+    }).catch(function(){
+      alert('No ad available right now. Please try again.');
+    });
+    return;
   }
 
   if(name==='Adsgram'){
     startAdTimer('Adsgram');
     return;
   }
-  if(name==='OnClickA'){
-    watchOnClickA();
-    return;
-  }
-    if(name.indexOf('Shortlink')===0){
+  if(name.indexOf('Shortlink')===0){
     var num = name.replace('Shortlink','').replace(' ','').trim();
     watchShortlink(num);
     return;
-}
+  }
 }
 
 // === Buttons call these ===
