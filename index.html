@@ -255,23 +255,6 @@ function startAdTimer(name){
 function triggerOnClickA_supportive(){
   console.log("OnClickA supportive pop after main ad");
 }
-// === GigaPub ===
-(window.loadGigaSDKCallbacks || (window.loadGigaSDKCallbacks = [])).push(() => {
-  window.loadOfferWallSDK({ projectId: '9308' })
-  .then(sdk => {
-    window.gigaOfferWallSDK = sdk;
-    sdk.on('rewardClaim', async (data) => {
-      // Give reward - 5 TAP for now
-      tapLeft += 5;
-      save();
-      render();
-      sdk.confirmReward(data.rewardId, data.hash);
-    });
-  });
-});
-function openOfferWall(){
-  window.Telegram.WebApp.openLink("https://link.gigapub.tech/l/x00j9zori");
-}
 function watchAd(name){
   // === GIGAPUB ADS ONLY - No sign-up, video ad only ===
   if(name=='GigaPub'){
