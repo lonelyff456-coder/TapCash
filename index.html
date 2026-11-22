@@ -318,10 +318,11 @@ function watchAd(name){
     watchOnClickA();
     return;
   }
-  if(name==='Shortlink 1'){ watchShortlink(1); return; }
-  if(name==='Shortlink 2'){ watchShortlink(2); return; }
-  if(name==='Shortlink 3'){ watchShortlink(3); return; }
-  if(name==='Shortlink 4'){ watchShortlink(4); return; }
+    if(name.indexOf('Shortlink')===0){
+    var num = name.replace('Shortlink','').replace(' ','').trim();
+    watchShortlink(num);
+    return;
+}
 }
 
 // === Buttons call these ===
